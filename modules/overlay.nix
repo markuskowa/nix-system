@@ -6,6 +6,7 @@
     ./countryfw.nix
     ./orangefs-client.nix
     ./orangefs-server.nix
+    ./inituser.nix
   ];
 
   nixpkgs.overlays = [ (import ../default.nix) ];
