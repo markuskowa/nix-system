@@ -7,6 +7,7 @@
     ./orangefs-client.nix
     ./orangefs-server.nix
     ./inituser.nix
+    ./banner.nix
   ];
 
   nixpkgs.overlays = [ (import ../default.nix) ];
