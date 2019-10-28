@@ -12,5 +12,6 @@ in {
   # Tests
   tests = {
     orangefs = handleTest ./tests/orangefs.nix;
+    banner = handleTest ./tests/banner.nix;
   };
 }

@@ -1,5 +1,7 @@
 { config, pkgs, lib, ... } :
 
+with lib;
+
 let
   cfg = config.environment.loginBanner;
   banner = pkgs.writeShellScriptBin "banner.sh" cfg.script;
@@ -23,9 +25,11 @@ in {
         echo "`${pkgs.figlet}/bin/figlet -f ${pkgs.figlet}/share/figlet/big.flf $host`
 
         $DATE
-        $version, $SYS"
+        $version, $SYS
 
         Last login $last_when from $last_ip
+
+        "
       '';
 
       description = ''
