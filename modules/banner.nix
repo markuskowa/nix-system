@@ -2,7 +2,7 @@
 
 let
   cfg = config.environment.loginBanner;
-  banner = pkgs.writeShellScriptBin "banner.sh" "cfg.script";
+  banner = pkgs.writeShellScriptBin "banner.sh" cfg.script;
 
 in {
 
