@@ -13,5 +13,6 @@ in {
   tests = {
     orangefs = handleTest ./tests/orangefs.nix;
     banner = handleTest ./tests/banner.nix;
+    networkmap = handleTest ./tests/networkmap.nix;
   };
 }
