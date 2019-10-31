@@ -7,7 +7,8 @@ in {
   # Evaluate overlay packages
   inherit (nixpkgs)
     orangefs
-    ipdeny-zones;
+    ipdeny-zones
+    redfishtool;
 
   # Tests
   tests = {
