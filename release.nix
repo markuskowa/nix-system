@@ -11,10 +11,11 @@ in {
     redfishtool;
 
   # Tests
-  tests = {
+  tests = nixpkgs.recurseIntoAttrs {
     orangefs = handleTest ./tests/orangefs.nix;
     banner = handleTest ./tests/banner.nix;
     networkmap = handleTest ./tests/networkmap.nix;
     sshCA = handleTest ./tests/sshCA.nix;
+    zfsAttrs = handleTest ./tests/zfs-attr.nix;
   };
 }

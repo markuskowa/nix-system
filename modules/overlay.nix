@@ -9,6 +9,7 @@
     ./inituser.nix
     ./banner.nix
     ./networkmap.nix
+    ./zfs-attrs.nix
   ];
 
   nixpkgs.overlays = [ (import ../default.nix) ];
