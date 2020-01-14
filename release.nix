@@ -6,12 +6,14 @@ let
 in {
   # Evaluate overlay packages
   inherit (nixpkgs)
+    nfs-ganesha
     orangefs
     ipdeny-zones
     redfishtool;
 
   # Tests
   tests = nixpkgs.recurseIntoAttrs {
+    nfs-ganesha = handleTest ./tests/nfs-ganesha.nix;
     orangefs = handleTest ./tests/orangefs.nix;
     banner = handleTest ./tests/banner.nix;
     networkmap = handleTest ./tests/networkmap.nix;
