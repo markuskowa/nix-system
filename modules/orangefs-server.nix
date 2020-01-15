@@ -19,7 +19,7 @@ let
       ID ${toString fs.id}
       RootHandle ${toString fs.rootHandle}
 
-      ${fs.extraConf}
+      ${fs.extraConfig}
 
       <MetaHandleRanges>
       ${concatStringsSep "\n" (
@@ -44,7 +44,7 @@ let
       <StorageHints>
       TroveSyncMeta ${if fs.troveSyncMeta then "yes" else "no"}
       TroveSyncData ${if fs.troveSyncData then "yes" else "no"}
-      ${fs.extraConfStorageHints}
+      ${fs.extraStorageHints}
       </StorageHints>
 
     </FileSystem>
@@ -56,11 +56,11 @@ let
     DataStorageSpace ${cfg.dataStorageSpace}
     MetaDataStorageSpace ${cfg.metadataStorageSpace}
 
-    BMIModules ${cfg.BMIModules}
-    ${cfg.extraConfDefaults}
+    BMIModules ${concatStringsSep "," cfg.BMIModules}
+    ${cfg.extraDefaults}
     </Defaults>
 
-    ${cfg.extraConf}
+    ${cfg.extraConfig}
 
     <Aliases>
     ${concatStringsSep "\n" (mapAttrsToList (alias: url: "Alias ${alias} ${url}") cfg.servers)}
@@ -97,20 +97,20 @@ in {
       };
 
       BMIModules = mkOption {
-        type = types.str;
-        default = "bmi_tcp";
-        example = "bmi_tcp,bmi_ib";
+        type = with types; listOf str;
+        default = [ "bmi_tcp" ];
+        example = [ "bmi_tcp" "bmi_ib"];
         description = "List of BMI modules to load.";
       };
 
-      extraConfDefaults = mkOption {
-        type = types.str;
+      extraDefaults = mkOption {
+        type = types.lines;
         default = "";
-        description = "Extra config for <Defaults> section.";
+        description = "Extra config for <literal>&lt;Defaults&gt;</literal> section.";
       };
 
-      extraConf = mkOption {
-        type = types.str;
+      extraConfig = mkOption {
+        type = types.lines;
         default = "";
         description = "Extra config for the global section.";
       };
@@ -128,9 +128,12 @@ in {
       };
 
       fileSystems = mkOption {
+        description = ''
+          These options will create the <literal>&lt;FileSystem&gt;</literal> sections of config file.
+        '';
         default = { orangefs = {}; };
-        defaultText = "{ orangefs = {}; }";
-        example = ''
+        defaultText = literalExample "{ orangefs = {}; }";
+        example = literalExample ''
           {
             fs1 = {
               id = 101;
@@ -155,10 +158,10 @@ in {
               description = "File system root ID.";
             };
 
-            extraConf = mkOption {
-              type = types.str;
+            extraConfig = mkOption {
+              type = types.lines;
               default = "";
-              description = "Extra config for <FileSystem> section.";
+              description = "Extra config for <literal>&lt;FileSystem&gt;</literal> section.";
             };
 
             troveSyncMeta = mkOption {
@@ -173,10 +176,10 @@ in {
               description = "Sync data.";
             };
 
-            extraConfStorageHints = mkOption {
-              type = types.str;
+            extraStorageHints = mkOption {
+              type = types.lines;
               default = "";
-              description = "Extra config for <StorageHints> section.";
+              description = "Extra config for <literal>&lt;StorageHints&gt;</literal> section.";
             };
           };
         }));
