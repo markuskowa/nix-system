@@ -57,7 +57,7 @@ in {
   options.networking.firewall = {
 
     countries = mkOption {
-      type = with types; listOf string;
+      type = with types; listOf str;
       default = [];
       example = literalExample "[ "de" "cn" ]";
       description =
