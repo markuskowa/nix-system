@@ -13,11 +13,11 @@ in {
 
   # Tests
   tests = nixpkgs.recurseIntoAttrs {
-    nfs-ganesha = handleTest ./tests/nfs-ganesha.nix;
-    orangefs = handleTest ./tests/orangefs.nix;
-    banner = handleTest ./tests/banner.nix;
-    networkmap = handleTest ./tests/networkmap.nix;
-    sshCA = handleTest ./tests/sshCA.nix;
-    zfsAttrs = handleTest ./tests/zfs-attr.nix;
+    nfs-ganesha = handleTest ./tests/nfs-ganesha.nix {};
+    orangefs = handleTest ./tests/orangefs.nix {};
+    banner = handleTest ./tests/banner.nix {};
+    networkmap = handleTest ./tests/networkmap.nix {};
+    sshCA = handleTest ./tests/sshCA.nix {};
+    zfsAttrs = handleTest ./tests/zfs-attr.nix {};
   };
 }
