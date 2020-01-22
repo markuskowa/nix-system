@@ -31,6 +31,7 @@ in rec {
     networkmap = handleTest ./tests/networkmap.nix {};
     sshCA = handleTest ./tests/sshCA.nix {};
     zfsAttrs = handleTest ./tests/zfs-attr.nix {};
+    userInit = handleTest ./tests/userInit.nix;
     slurmPmix = handleTest ./tests/slurmPmix.nix {};
   };
 
