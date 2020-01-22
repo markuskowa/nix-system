@@ -18,6 +18,7 @@ in {
     banner = handleTest ./tests/banner.nix;
     networkmap = handleTest ./tests/networkmap.nix;
     sshCA = handleTest ./tests/sshCA.nix;
+    userInit = handleTest ./tests/userInit.nix;
     zfsAttrs = handleTest ./tests/zfs-attr.nix;
   };
 }

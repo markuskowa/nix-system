@@ -1,55 +1,14 @@
-{ config, lib, utils, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 with lib;
 
 let
-  cfg = config.users;
+  cfg = config.users.setupEnv;
 
-  script = user :
-    ( concatMapStringsSep "" (dir: ''
-      dir=${dir}/${user.name}
-      if [ ! -d $dir ]; then
-        mkdir -p -m750 $dir
-        chown ${user.name}:${user.group} $dir
-      fi
-    '') cfg.clusterSetupEnv.extraUserDirs )
-  + optionalString (stringLength cfg.clusterSetupEnv.configNix != 0)
-  ''
-    dir=${user.home}/.nixpkgs
-    if [ ! -f $dir/config.nix ]; then
-      mkdir -p -m750 $dir
-      echo "${cfg.clusterSetupEnv.configNix}" > $dir/config.nix
-      chown -R ${user.name}:${user.group} $dir
-    fi
-  ''
-  + optionalString cfg.clusterSetupEnv.createSshKey
-  ''
-    dir=${user.home}/.ssh
-    if [ ! -d $dir ]; then
-      mkdir -p -m700 $dir
-      chown -R ${user.name}:${user.group} $dir
-    fi
-    if [ ! -f $dir/id_rsa ]; then
-      ${pkgs.openssh}/bin/ssh-keygen -C "cluster key (${user.name})" -f $dir/id_rsa -N ""
-      chown ${user.name}:${user.group} $dir/id_rsa*
-    fi
-  ''
-  + optionalString cfg.clusterSetupEnv.sshKeySelfAuthorized ''
-    dir=${user.home}/.ssh
-    if [ ! -f $dir/authorized_keys ]; then
-      cat $dir/id_rsa.pub >> $dir/authorized_keys
-      chown ${user.name}:${user.group} $dir/authorized_keys
-    else
-      grep "`cat $dir/id_rsa.pub`" $dir/authorized_keys >/dev/null;
-      if  [ ! $? ]; then
-        cat $dir/id_rsa.pub >> $dir/authorized_keys
-      fi
-    fi
-  '';
 
 in {
   options = {
-    users.clusterSetupEnv = {
+    users.setupEnv = {
       enable = mkOption {
         type = types.bool;
         default = true;
@@ -65,13 +24,26 @@ in {
         '';
       };
       extraUserDirs = mkOption {
-        type = with types; listOf str;
-        default = [];
         description = ''
           List of additional per-user directories.
           A sub directory with the users name is created at these paths
           if it does not already exist.
         '';
+        default = [];
+        type = types.listOf (types.submodule ({ prefix , node, ...} : {
+          options = {
+            dir = mkOption {
+              type = types.str;
+              default = null;
+              description = "Absolute path.";
+            };
+            mode = mkOption {
+              type = types.strMatching "[0-7]{3}[0-7]*";
+              default = "0700";
+              description = "Access mode (octal). Is enforced";
+            };
+          };
+        }));
       };
       createSshKey = mkOption {
         type = types.bool;
@@ -90,11 +62,56 @@ in {
     };
   };
 
-  config = {
-    system.activationScripts.clusterSetupEnv = mkIf cfg.clusterSetupEnv.enable ( stringAfter [ "users" "groups" ] (
-       with lib;
-         foldr (user: str: str + (optionalString user.isNormalUser (script user) ))
-               "" (mapAttrsToList (n: v: v) cfg.users)
-    ));
+  config = mkIf cfg.enable {
+    # setup extra dirs
+    systemd.tmpfiles.rules =
+      flatten (
+        map ( dir:
+          map (user:
+            "v ${dir.dir}/${user.name} ${dir.mode} ${user.name} ${user.group} "
+          ) ( lib.filter (u: u.isNormalUser)
+            ( mapAttrsToList (name: value: value) config.users.users ))
+        ) cfg.extraUserDirs
+      );
+
+
+    # User environment setup is checked on login
+    environment.loginShellInit = mkIf (cfg.createSshKey ||
+                                       cfg.sshKeySelfAuthorized ||
+                                      ( stringLength cfg.configNix > 0 )) (
+    ''
+      if [ `id -u` != 0 ]; then
+    '' +  optionalString cfg.createSshKey ''
+      dir=$HOME/.ssh
+      if [ ! -d $dir ]; then
+        mkdir -p -m700 $dir
+      fi
+      if [ ! -f $dir/id_rsa ]; then
+        echo "Creating SSH keypair..."
+        ${pkgs.openssh}/bin/ssh-keygen  -f $dir/id_rsa -N ""
+      fi
+    '' + optionalString (cfg.sshKeySelfAuthorized && cfg.sshKeySelfAuthorized )''
+      dir=$HOME/.ssh
+      if [ ! -f $dir/authorized_keys ]; then
+        echo "Creating authorized_keys..."
+        cat $dir/id_rsa.pub >> $dir/authorized_keys
+      else
+        grep "`cat $dir/id_rsa.pub`" $dir/authorized_keys > /dev/null
+        if  [ $? != 0 ]; then
+          echo "Adding id_rsa.pub to authorized_keys..."
+          cat $dir/id_rsa.pub >> $dir/authorized_keys
+        fi
+      fi
+    '' + optionalString (stringLength cfg.configNix > 0) ''
+      dir=$HOME/.nixpkgs
+      if [ ! -f $dir/config.nix ]; then
+        mkdir -p -m750 $dir
+        echo "${cfg.configNix}" > $dir/config.nix
+      fi
+    '' + ''
+      #touch $HOME/.initialized
+      fi
+    '');
+
   };
 }
