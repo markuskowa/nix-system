@@ -45,6 +45,7 @@
 
   testScript = ''
     $node->waitForUnit("sshd.service");
+    $server->waitForUnit("multi-user.target");
     $server->succeed('ssh-keygen -t rsa -N "" -f ca_host_key -I CA');
     $server->succeed("scp -i /etc/dummy-ssh-r -o 'StrictHostKeyChecking no' node:/etc/ssh/ssh_host_ed25519_key.pub .");
     $server->succeed("ssh-keygen -s ca_host_key -h -I node ssh_host_ed25519_key.pub");

@@ -52,6 +52,7 @@
 
   testScript = ''
     $server->waitForUnit("sshd");
+    $client->waitForUnit("multi-user.target");
 
     # Dump login screen to log
     $client->succeed("sudo -u testUser ssh -i /etc/dummy-ssh-u -o 'StrictHostKeyChecking no' -t server true 1>&2");
