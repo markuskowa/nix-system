@@ -1,5 +1,5 @@
-{ stdenv, fetchurl, bison, flex, autoreconfHook
-, openssl, db, attr, perl, tcsh
+{ stdenv, fetchurl, bison, flex
+, openssl, attr, perl, tcsh
 } :
 
 stdenv.mkDerivation rec {
@@ -11,8 +11,8 @@ stdenv.mkDerivation rec {
     sha256 = "15669f5rcvn44wkas0mld0qmyclrmhbrw4bbbp66sw3a12vgn4sm";
   };
 
-  nativeBuildInputs = [ bison flex perl autoreconfHook ];
-  buildInputs = [ openssl db attr tcsh ];
+  nativeBuildInputs = [ bison flex perl ];
+  buildInputs = [ openssl attr tcsh ];
 
   postPatch = ''
     # Issue introduced by attr-2.4.48
@@ -31,6 +31,7 @@ stdenv.mkDerivation rec {
   configureFlags = [
     "--sysconfdir=/etc/orangefs"
     "--enable-shared"
+    "--with-db-backend=lmdb"
     "--enable-fast"
     "--enable-racache"
     "--enable-ucache"
