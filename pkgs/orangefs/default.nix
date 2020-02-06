@@ -1,5 +1,6 @@
 { stdenv, fetchurl, bison, flex
-, openssl, attr, perl, tcsh
+, openssl, attr, perl, tcsh, db
+, enableLmdb ? false
 } :
 
 stdenv.mkDerivation rec {
@@ -12,7 +13,8 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [ bison flex perl ];
-  buildInputs = [ openssl attr tcsh ];
+  buildInputs = [ openssl attr tcsh ]
+   ++ stdenv.lib.optional (!enableLmdb) db;
 
   postPatch = ''
     # Issue introduced by attr-2.4.48
@@ -31,12 +33,12 @@ stdenv.mkDerivation rec {
   configureFlags = [
     "--sysconfdir=/etc/orangefs"
     "--enable-shared"
-    "--with-db-backend=lmdb"
     "--enable-fast"
     "--enable-racache"
     "--enable-ucache"
     "--with-ssl=${stdenv.lib.getDev openssl}"
-  ];
+  ]
+   ++ stdenv.lib.optional enableLmdb "--with-db-backend=lmdb";
 
 
   enableParallelBuilding = true;
