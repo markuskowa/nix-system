@@ -15,7 +15,10 @@
 
       boot.zfs.extraPools = [ "rpool" ];
 
-      services.zfs.datasets."rpool/vol".quota = "1G";
+      services.zfs.datasets = {
+        enable = true;
+        properties."rpool/vol".quota = "1G";
+      };
     };
   };
 
