@@ -24,7 +24,6 @@
 
   testScript = ''
     $machine->succeed("zpool create rpool /dev/vdb");
-    $machine->succeed("zfs create rpool/vol");
 
     $machine->shutdown();
 
