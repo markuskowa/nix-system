@@ -15,7 +15,6 @@ in {
   tests = nixpkgs.recurseIntoAttrs {
     infiniband = handleTest ./tests/infiniband.nix {};
     nfs-ganesha = handleTest ./tests/nfs-ganesha.nix {};
-    orangefs = handleTest ./tests/orangefs.nix {};
     moosefs = handleTest ./tests/moosefs.nix {};
     banner = handleTest ./tests/banner.nix {};
     networkmap = handleTest ./tests/networkmap.nix {};

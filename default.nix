@@ -8,8 +8,6 @@ in {
 
   ntirpc = callPackage ./pkgs/ntirpc {};
 
-  orangefs = callPackage ./pkgs/orangefs {};
-
   ipdeny-zones = callPackage ./pkgs/ipdeny-zones {};
 
   redfishtool = callPackage ./pkgs/redfishtool {};

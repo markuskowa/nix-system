@@ -7,8 +7,6 @@
     ./infiniband.nix
     ./moosefs.nix
     ./nfs-ganesha.nix
-    ./orangefs-client.nix
-    ./orangefs-server.nix
     ./inituser.nix
     ./banner.nix
     ./networkmap.nix
