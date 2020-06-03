@@ -5,6 +5,7 @@
   imports = [
     ./countryfw.nix
     ./infiniband.nix
+    ./moosefs.nix
     ./nfs-ganesha.nix
     ./orangefs-client.nix
     ./orangefs-server.nix
