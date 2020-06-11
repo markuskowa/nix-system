@@ -5,13 +5,13 @@
 
 stdenv.mkDerivation rec {
   pname = "nfs-ganesha";
-  version = "3.2";
+  version = "3.3";
 
   src = fetchFromGitHub {
     owner = "nfs-ganesha";
     repo = "nfs-ganesha";
     rev = "V${version}";
-    sha256 = "1pxrglnih92pv1ai9iq3ghz9387a3bn9nzfa5wq9wpr7w51lqjhn";
+    sha256 = "1w48rqrbqah0hnirvjdz8lyr9ah8b73j3cgsppb04gnrmpssgmb6";
   };
 
   patches = [ ./sysstatedir.patch ];
