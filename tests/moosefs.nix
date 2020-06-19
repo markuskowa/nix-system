@@ -24,12 +24,12 @@ let
 
     virtualisation.emptyDiskImages = [ 4096 ];
 
-    fileSystems = pkgs.lib.mkVMOverride
-      [ { mountPoint = "/data";
-          device = "/dev/disk/by-label/data";
-          fsType = "ext4";
-        }
-      ];
+    fileSystems = pkgs.lib.mkVMOverride {
+      "/data" = {
+        device = "/dev/disk/by-label/data";
+        fsType = "ext4";
+      };
+    };
 
     services.moosefs = {
       masterHost = "master";

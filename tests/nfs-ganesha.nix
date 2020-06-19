@@ -10,12 +10,12 @@ let
 
     virtualisation.emptyDiskImages = [ 4096 ];
 
-    fileSystems = pkgs.lib.mkVMOverride
-      [ { mountPoint = "/data";
-          device = "/dev/disk/by-label/data";
-          fsType = "ext4";
-        }
-      ];
+    fileSystems = pkgs.lib.mkVMOverride {
+      "/data" = {
+        device = "/dev/disk/by-label/data";
+        fsType = "ext4";
+      };
+    };
 
     services.nfs-ganesha = {
       enable = true;
@@ -56,11 +56,12 @@ let
   client = { lib, pkgs, ... } : {
     networking.firewall.enable = true;
 
-    fileSystems = lib.mkVMOverride [ {
-      device = "server:/";
-      fsType = "nfs4";
-      mountPoint = "/data";
-    } ];
+    fileSystems = lib.mkVMOverride {
+      "/data" = {
+        device = "server:/";
+       fsType = "nfs4";
+      };
+    };
   };
 
 in {
