@@ -16,6 +16,9 @@ in rec {
   inherit (pkgs)
     nfs-ganesha
     ipdeny-zones
+    pmix
+    openmpi
+    slurm
     redfishtool;
 
   # Tests
@@ -27,6 +30,7 @@ in rec {
     networkmap = handleTest ./tests/networkmap.nix {};
     sshCA = handleTest ./tests/sshCA.nix {};
     zfsAttrs = handleTest ./tests/zfs-attr.nix {};
+    slurmPmix = handleTest ./tests/slurmPmix.nix {};
   };
 
   upstreamTests = {
