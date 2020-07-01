@@ -60,7 +60,7 @@
       "f /etc/munge.key 0400 munge munge - 12345678901234567901234567890123"
     ];
 
-    environment.systemPackages = [ pkgs.openmpi pkgs.pmix mpitest pkgs.slurm ];
+    environment.systemPackages = [ pkgs.openmpi mpitest ];
 
 
     #users.users.root.password = "test";
