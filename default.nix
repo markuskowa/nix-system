@@ -12,16 +12,6 @@ in {
 
   pmix = callPackage ./pkgs/pmix {};
 
-  openmpi = super.openmpi.overrideAttrs ( x: {
-    buildInputs = x.buildInputs ++ [ self.pmix ];
-    configureFlags = x.configureFlags ++ [
-      #"--with-ompi-pmix-rte"
-      #"--disable-oshmem"
-      "--with-pmix=${self.pmix}"
-      "--with-pmix-libdir=${self.pmix}/lib"
-    ];
-  });
-
   slurm = super.slurm.overrideAttrs ( x: {
     buildInputs = x.buildInputs ++ [ self.pmix ];
     nativeBuildInputs = x.nativeBuildInputs ++ [ self.installShellFiles ];
