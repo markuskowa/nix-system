@@ -15,6 +15,11 @@ in stdenv.mkDerivation {
     sha256 = "0fvfsig20amcigyn4v3gcdxc0jif44vqg37b8zzh0s8jqqj7jz5w";
   };
 
+  postPatch = ''
+    patchShebangs ./autogen.pl
+    patchShebangs ./config
+  '';
+
   nativeBuildInputs = [ perl autoconf automake libtool flex ];
 
   buildInputs = [ libevent hwloc munge zlib ];
@@ -26,18 +31,16 @@ in stdenv.mkDerivation {
   ];
 
   preConfigure = ''
-    patchShebangs ./autogen.pl
-    patchShebangs ./config
     ./autogen.pl
   '';
 
   enableParallelBuilding = true;
 
-
   meta = with stdenv.lib; {
-    description = "";
-    homepage = https://;
-    license = with licenses; gpl2;
+    description = "Process Management Interface for HPC environments";
+    homepage = "https://openpmix.github.io/";
+    license = licenses.bsd3;
+    maintainers = [ maintainers.markuskowa ];
     platforms = platforms.linux;
   };
 }
