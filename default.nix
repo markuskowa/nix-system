@@ -14,7 +14,6 @@ in {
 
   slurm = super.slurm.overrideAttrs ( x: {
     buildInputs = x.buildInputs ++ [ self.pmix ];
-    nativeBuildInputs = x.nativeBuildInputs ++ [ self.installShellFiles ];
     configureFlags = x.configureFlags ++ [
       "--with-pmix=${self.pmix}"
     ];
@@ -24,10 +23,6 @@ in {
       # Account for long nix store paths in commandline string
       ./patches/userenv-maxpath-length.patch
     ];
-
-    postInstall = x.postInstall + ''
-      installShellCompletion --bash contribs/slurm_completion_help/slurm_completion.sh
-    '';
   });
 
   redfishtool = callPackage ./pkgs/redfishtool {};
