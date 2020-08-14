@@ -39,6 +39,7 @@
     virtualisation.cores = 2;
     imports = [ ../modules/overlay.nix ];
     services.slurm = {
+      package = pkgs.slurmPmix;
       client.enable = true;
       server.enable = true;
       controlMachine = "mach";

@@ -12,7 +12,7 @@ in {
 
   pmix = callPackage ./pkgs/pmix {};
 
-  slurm = super.slurm.overrideAttrs ( x: {
+  slurmPmix = super.slurm.overrideAttrs ( x: {
     buildInputs = x.buildInputs ++ [ self.pmix ];
     configureFlags = x.configureFlags ++ [
       "--with-pmix=${self.pmix}"
