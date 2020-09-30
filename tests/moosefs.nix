@@ -69,30 +69,26 @@ in {
 
   testScript = ''
     # prepare master server
-    $master->start();
-    $master->waitForUnit("multi-user.target");
-    $master->succeed("mfsmaster-init");
-    $master->succeed("systemctl restart mfs-master");
-    $master->waitForUnit("mfs-master.service");
+    master.start()
+    master.wait_for_unit("multi-user.target")
+    master.succeed("mfsmaster-init")
+    master.succeed("systemctl restart mfs-master")
+    master.wait_for_unit("mfs-master.service")
 
-    $metalogger->waitForUnit("mfs-metalogger.service");
+    metalogger.wait_for_unit("mfs-metalogger.service")
 
-    foreach my $chunkserver (($chunkserver1,$chunkserver2))
-    {
-      $chunkserver->waitForUnit("multi-user.target");
-      $chunkserver->succeed("chown moosefs:moosefs /data");
-      $chunkserver->succeed("systemctl restart mfs-chunkserver");
-      $chunkserver->waitForUnit("mfs-chunkserver.service");
-    }
+    for chunkserver in [chunkserver1, chunkserver2]:
+        chunkserver.wait_for_unit("multi-user.target")
+        chunkserver.succeed("chown moosefs:moosefs /data")
+        chunkserver.succeed("systemctl restart mfs-chunkserver")
+        chunkserver.wait_for_unit("mfs-chunkserver.service")
 
-    foreach my $client (($client1,$client2))
-    {
-      $client->waitForUnit("multi-user.target");
-      $client->succeed("mkdir /moosefs");
-      $client->succeed("mount -t moosefs master:/ /moosefs");
-    }
+    for client in [client1, client2]:
+        client.wait_for_unit("multi-user.target")
+        client.succeed("mkdir /moosefs")
+        client.succeed("mount -t moosefs master:/ /moosefs")
 
-    $client1->succeed("echo test > /moosefs/file");
-    $client2->succeed("grep test /moosefs/file");
+    client1.succeed("echo test > /moosefs/file")
+    client2.succeed("grep test /moosefs/file")
   '';
 }

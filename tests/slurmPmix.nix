@@ -69,17 +69,17 @@
   };
 
   testScript = ''
-    startAll();
-    $mach->waitForUnit("default.target");
-    $mach->waitForUnit("systemd-tmpfiles-setup.service");
-    $mach->succeed("systemctl restart munged");
-    $mach->waitForUnit("slurmctld.service");
-    $mach->waitForUnit("slurmd.service");
+    start_all()
+    mach.wait_for_unit("default.target")
+    mach.wait_for_unit("systemd-tmpfiles-setup.service")
+    mach.succeed("systemctl restart munged")
+    mach.wait_for_unit("slurmctld.service")
+    mach.wait_for_unit("slurmd.service")
 
     # plain mpirun
-    $mach->succeed("mpirun --allow-run-as-root -np 2 mpitest | grep 'size=2'");
+    mach.succeed("mpirun --allow-run-as-root -np 2 mpitest | grep 'size=2'")
 
     # basic srun
-    $mach->succeed("srun -n2 mpitest | grep size=2");
+    mach.succeed("srun -n2 mpitest | grep size=2")
   '';
 }

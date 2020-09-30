@@ -99,24 +99,24 @@ in {
   };
 
   testScript = ''
-    $server->waitForUnit("dhcpd4.service");
+    server.wait_for_unit("dhcpd4.service")
     # Check MAC addresses
-    $node1->succeed("ifconfig eth1 | grep aa:22:33:44:af:66");
-    $node1->succeed("ifconfig eth2 | grep aa:22:33:44:af:68");
+    node1.succeed("ifconfig eth1 | grep aa:22:33:44:af:66")
+    node1.succeed("ifconfig eth2 | grep aa:22:33:44:af:68")
 
-    $node2->succeed("ifconfig eth1 | grep aa:22:33:44:af:67");
-    $node2->succeed("ifconfig eth2 | grep aa:22:33:44:af:69");
+    node2.succeed("ifconfig eth1 | grep aa:22:33:44:af:67")
+    node2.succeed("ifconfig eth2 | grep aa:22:33:44:af:69")
 
-    $node1->waitUntilSucceeds("ifconfig eth1 | grep 192.168.10.1");
-    $node1->waitUntilSucceeds("ifconfig eth2 | grep 192.168.11.1");
+    node1.wait_until_succeeds("ifconfig eth1 | grep 192.168.10.1")
+    node1.wait_until_succeeds("ifconfig eth2 | grep 192.168.11.1")
 
-    $node2->waitUntilSucceeds("ifconfig eth1 | grep 192.168.10.2");
-    $node2->waitUntilSucceeds("ifconfig eth2 | grep 192.168.11.2");
+    node2.wait_until_succeeds("ifconfig eth1 | grep 192.168.10.2")
+    node2.wait_until_succeeds("ifconfig eth2 | grep 192.168.11.2")
 
-    $node1->waitUntilSucceeds("ping -c 1 n-node2");
-    $node1->waitUntilSucceeds("ping -c 1 d-node2");
+    node1.wait_until_succeeds("ping -c 1 n-node2")
+    node1.wait_until_succeeds("ping -c 1 d-node2")
 
-    $node1->waitUntilSucceeds("ping -c 1 n1");
-    $node1->waitUntilSucceeds("ping -c 1 d1");
+    node1.wait_until_succeeds("ping -c 1 n1")
+    node1.wait_until_succeeds("ping -c 1 d1")
   '';
 }

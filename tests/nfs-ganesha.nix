@@ -75,20 +75,17 @@ in {
   };
 
   testScript = ''
-    $server->waitForUnit("ganesha-nfsd.service");
+    server.wait_for_unit("ganesha-nfsd.service")
 
     # Check if clients can reach and mount the FS
-    foreach my $client  (($client1,$client2))
-    {
-      $client->waitForUnit("multi-user.target");
-    }
+    for client in [client1, client2]:
+        client.wait_for_unit("multi-user.target")
 
     # R/W test between clients
-    $client1->waitForUnit("data.mount");
-    $client2->waitForUnit("data.mount");
+    client1.wait_for_unit("data.mount")
+    client2.wait_for_unit("data.mount")
 
-    $client1->succeed("echo test > /data/file1");
-    $client2->succeed("grep test /data/file1");
-
+    client1.succeed("echo test > /data/file1")
+    client2.succeed("grep test /data/file1")
   '';
 }

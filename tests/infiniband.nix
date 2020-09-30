@@ -13,7 +13,7 @@
   };
 
   testScript = ''
-    $machine->waitForUnit("multi-user.target");
-    $machine->succeed("ibsysstat -V");
+    machine.wait_for_unit("multi-user.target")
+    machine.succeed("ibsysstat -V")
   '';
 }
