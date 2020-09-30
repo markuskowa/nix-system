@@ -23,12 +23,12 @@
   };
 
   testScript = ''
-    $machine->succeed("zpool create rpool /dev/vdb");
+    machine.succeed("zpool create rpool /dev/vdb")
 
-    $machine->shutdown();
+    machine.shutdown()
 
-    $machine->waitForUnit("multi-user.target");
+    machine.wait_for_unit("multi-user.target")
 
-    $machine->succeed("zfs get quota rpool/vol | grep 1G");
+    machine.succeed("zfs get quota rpool/vol | grep 1G")
   '';
 }
