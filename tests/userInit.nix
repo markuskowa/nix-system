@@ -38,26 +38,26 @@
 
 
   testScript = ''
-
-    $server->waitForUnit("sshd");
+    server.wait_for_unit("sshd")
 
     # Check for extra dir
-    $server->succeed("stat -c %a /extra/test | grep 750");
-    $server->succeed("stat -c %U /extra/test | grep test");
+    server.succeed("stat -c %a /extra/test | grep 750")
+    server.succeed("stat -c %U /extra/test | grep test")
 
-    my $key=`${pkgs.openssh}/bin/ssh-keygen -t ed25519 -f key -N ""`;
+    os.system(
+        '${pkgs.openssh}/bin/ssh-keygen -t ed25519 -f key -N ""'
+    )
 
     # Deploy key
-    $server->succeed("mkdir -p -m 0700 /home/test/.ssh");
-    $server->copyFileFromHost("key.pub", "/home/test/.ssh/authorized_keys");
-    $server->succeed("chown -R test /home/test/");
+    server.succeed("mkdir -p -m 0700 /home/test/.ssh")
+    server.copy_from_host("key.pub", "/home/test/.ssh/authorized_keys")
+    server.succeed("chown -R test /home/test/")
 
     # Initate create of SSH setup
-    $server->succeed("sudo -i -u test stat /home/test/.ssh/id_rsa");
+    server.succeed("sudo -i -u test stat /home/test/.ssh/id_rsa")
 
     # Make sure self ssh login works now
-    $server->succeed("sudo -u test ssh -o 'StrictHostKeyChecking no' -t server true");
-
+    server.succeed("sudo -u test ssh -o 'StrictHostKeyChecking no' -t server true")
   '';
 }
 
