@@ -8,6 +8,8 @@ in {
 
   pmix = callPackage ./pkgs/pmix {};
 
+  nhc = callPackage ./pkgs/nhc {};
+
   slurmPmix = super.slurm.overrideAttrs ( x: {
     buildInputs = x.buildInputs ++ [ self.pmix ];
     configureFlags = x.configureFlags ++ [

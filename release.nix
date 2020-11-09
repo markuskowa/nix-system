@@ -15,6 +15,7 @@ in rec {
   # Evaluate overlay packages
   inherit (pkgs)
     nfs-ganesha
+    nhc
     ipdeny-zones
     pmix
     openmpi
