@@ -53,7 +53,7 @@ in
           res=$(zfs list "$ds" 2> /dev/null > /dev/null || echo create)
           if [ "$res" == "create" ]; then
             echo "creating $s"
-            zfs create "$ds"
+            zfs create -p "$ds"
           fi
         done
 

@@ -17,7 +17,7 @@
 
       services.zfs.datasets = {
         enable = true;
-        properties."rpool/vol".quota = "1G";
+        properties."rpool/store/vol".quota = "1G";
       };
     };
   };
@@ -29,6 +29,6 @@
 
     machine.wait_for_unit("multi-user.target")
 
-    machine.succeed("zfs get quota rpool/vol | grep 1G")
+    machine.succeed("zfs get quota rpool/store/vol | grep 1G")
   '';
 }
