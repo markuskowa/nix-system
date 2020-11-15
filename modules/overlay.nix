@@ -5,6 +5,8 @@
   imports = [
     ./countryfw.nix
     ./infiniband.nix
+    ./iscsid.nix
+    ./iscsiTarget.nix
     ./moosefs.nix
     ./nfs-ganesha.nix
     ./inituser.nix

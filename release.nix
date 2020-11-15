@@ -28,6 +28,7 @@ in rec {
     nfs-ganesha = handleTest ./tests/nfs-ganesha.nix {};
     moosefs = handleTest ./tests/moosefs.nix {};
     banner = handleTest ./tests/banner.nix {};
+    iscsi = handleTest ./tests/iscsi.nix {};
     networkmap = handleTest ./tests/networkmap.nix {};
     sshCA = handleTest ./tests/sshCA.nix {};
     zfsAttrs = handleTest ./tests/zfs-attr.nix {};
