@@ -10,6 +10,8 @@ in {
 
   nhc = callPackage ./pkgs/nhc {};
 
+  targetisns = callPackage ./pkgs/targetisns {};
+
   slurmPmix = super.slurm.overrideAttrs ( x: {
     buildInputs = x.buildInputs ++ [ self.pmix ];
     configureFlags = x.configureFlags ++ [
