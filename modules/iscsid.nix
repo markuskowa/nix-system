@@ -34,6 +34,41 @@ in {
         example = "iqn.2004-01.org.nixos.san:initiator";
         default = "iqn.2004-01.org.nixos.san:${config.networking.hostName}";
       };
+
+      scanTargets = mkOption {
+        type = types.listOf ( types.submodule {
+          options = {
+            target = mkOption {
+              type = types.str;
+              description = ''
+                IP address or hostname
+              '';
+            };
+
+            port = mkOption {
+              type = with types; nullOr port;
+              default = null;
+              description = ''
+                TCP port. If ommited, default will be used.
+              '';
+            };
+
+            type = mkOption {
+              type = types.enum [ "sendtargets" "isns"];
+              default = "sendtargets";
+              description = ''
+                Type of target:
+                sendtargets or isns for iSNS server
+              '';
+            };
+          };
+        });
+        default = [];
+        example = [ { target = "iscsi-server"; type = "sendtargets"; } ];
+        description = ''
+          List of targets to scan.
+        '';
+      };
     };
   };
 
@@ -74,12 +109,24 @@ in {
         after = [ "network.target" "network-online.target" "iscsid.service" ];
         requires = [ "iscsid.service" ];
 
+        preStart = ''
+          ${concatStringsSep "\n" (
+            map (target:
+            "${pkgs.openiscsi}/bin/iscsiadm \\
+                --mode discovery \\
+                --op update \\
+                --type ${target.type} \\
+                --portal ${target.target}${optionalString (target.port != null) ":${toString target.port}"}"
+                ) cfg.scanTargets )
+          }
+        '';
+
         serviceConfig = {
           Type = "oneshot";
           ExecStart = "${pkgs.openiscsi}/bin/iscsiadm -m node --loginall=automatic";
-          ExecStop = "${pkgs.openiscsi}/bin/iscsiadm -m node --logoutall=automatic";
-          SuccessExitStatus=21;
-          RemainAfterExit=true;
+          ExecStop = "${pkgs.openiscsi}/bin/iscsiadm -m node --logoutall=all";
+          SuccessExitStatus = [ 21 15 ];
+          RemainAfterExit = true;
         };
        };
     };

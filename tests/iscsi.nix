@@ -1,6 +1,19 @@
 { pkgs, lib, ... } :
 
-{
+let
+  iqnPfx = "iqn.2004-01.org.nixos.san";
+  targetInit = pkgs.writeShellScript "targetInit" ''
+    targetcli /backstores/block create vol /dev/vdb
+    targetcli /iscsi create ${iqnPfx}:server
+
+    targetcli /iscsi/${iqnPfx}:server/tpg1/luns create /backstores/block/vol
+    targetcli /iscsi/${iqnPfx}:server/tpg1/acls create ${iqnPfx}:client
+    targetcli /iscsi/${iqnPfx}:server/tpg1/acls/${iqnPfx}:client set auth userid=client
+    targetcli /iscsi/${iqnPfx}:server/tpg1/acls/${iqnPfx}:client set auth password=test
+
+    targetcli saveconfig
+  '';
+in {
   name = "iscsi";
 
   nodes = {
@@ -18,6 +31,8 @@
         config = ''
           node.startup = automatic
         '';
+
+        scanTargets = [ { target = "server"; } ];
 
         secrets = "${secrets}";
       };
@@ -46,22 +61,7 @@
 
         # Create target
         server.succeed("test -d /etc/target")
-        server.succeed("targetcli /backstores/block create vol /dev/vdb")
-        server.succeed("targetcli /iscsi create iqn.2004-01.org.nixos.san:server")
-        server.succeed(
-            "targetcli /iscsi/iqn.2004-01.org.nixos.san:server/tpg1/luns create /backstores/block/vol"
-        )
-        server.succeed(
-            "targetcli /iscsi/iqn.2004-01.org.nixos.san:server/tpg1/acls create iqn.2004-01.org.nixos.san:client"
-        )
-        server.succeed(
-            "targetcli /iscsi/iqn.2004-01.org.nixos.san:server/tpg1/acls/iqn.2004-01.org.nixos.san:client set auth userid=client"
-        )
-        server.succeed(
-            "targetcli /iscsi/iqn.2004-01.org.nixos.san:server/tpg1/acls/iqn.2004-01.org.nixos.san:client set auth password=test"
-        )
-
-        server.succeed("targetcli saveconfig")
+        server.succeed("${targetInit}")
 
     with subtest("Restore Target"):
         server.shutdown()
@@ -76,15 +76,9 @@
         client.start()
         client.wait_for_unit("multi-user.target")
 
-        client.succeed("iscsiadm --mode discovery --op update --type sendtargets -p server")
-        client.succeed("iscsiadm --mode node -l all")
         client.wait_for_file("/dev/sda")
 
         client.succeed("mkdir -p /mnt; mount /dev/sda /mnt")
         client.succeed("touch /mnt/hello")
-
-        client.shutdown()
-        client.start()
-        client.wait_for_file("/dev/sda")
   '';
 }
