@@ -16,6 +16,7 @@ in rec {
   inherit (pkgs)
     nfs-ganesha
     nhc
+    targetisns
     ipdeny-zones
     pmix
     openmpi
@@ -29,6 +30,7 @@ in rec {
     moosefs = handleTest ./tests/moosefs.nix {};
     banner = handleTest ./tests/banner.nix {};
     iscsi = handleTest ./tests/iscsi.nix {};
+    isns = handleTest ./tests/isns.nix {};
     networkmap = handleTest ./tests/networkmap.nix {};
     sshCA = handleTest ./tests/sshCA.nix {};
     zfsAttrs = handleTest ./tests/zfs-attr.nix {};

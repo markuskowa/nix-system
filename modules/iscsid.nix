@@ -19,7 +19,9 @@ in {
       config = mkOption {
         type = types.str;
         description = "Contents of config file (iscsid.conf)";
-        default = "/etc/iscsi/iscsid.conf";
+        default = ''
+          node.startup = automatic
+        '';
       };
 
       secrets = mkOption {

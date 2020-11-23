@@ -11,6 +11,24 @@ in {
   options = {
     services.iscsiTarget = {
       enable = mkEnableOption "iSCSI LIO target";
+
+      isns = {
+        enable = mkEnableOption "iSNS service for LIO target";
+        server = mkOption {
+          type = types.str;
+          default = null;
+          description = "iSNS server";
+        };
+      };
+
+      config = mkOption {
+        type = with types; nullOr attrs;
+        default = null;
+        description = ''
+          The config will be converted to JSON for targetcli.
+          If ommited imperative state is used.
+        '';
+      };
     };
   };
 
@@ -19,7 +37,8 @@ in {
 
   config = mkIf cfg.enable {
 
-    environment.systemPackages = [ pkgs.targetcli ];
+    environment.systemPackages = [ pkgs.targetcli ]
+      ++ optional cfg.isns.enable pkgs.targetisns;
 
     systemd.tmpfiles.rules = [
       "v /etc/target - - - - -"
@@ -36,7 +55,8 @@ in {
 
         serviceConfig = {
           Type = "oneshot";
-          ExecStart = "${pkgs.pythonPackages.rtslib}/bin/targetctl restore";
+          ExecStart = "${pkgs.pythonPackages.rtslib}/bin/targetctl restore ${optionalString (cfg.config != null) "${pkgs.writeText "targetcli.json" (toJSON cfg.config)}"}";
+          ExecStop = "${pkgs.pythonPackages.rtslib}/bin/targetctl clear";
           RemainAfterExit=true;
         };
       };
@@ -52,6 +72,18 @@ in {
           Type = "simple";
           ExecStart = "${pkgs.targetcli}/bin/targetclid";
           Restart = "on-failure";
+        };
+      };
+
+      target-isns = mkIf cfg.isns.enable {
+        after = [ "network.target" "iscsiTarget.service" ];
+        wantedBy = [ "remote-fs.target" ];
+        requires = [ "targetclid" ];
+        bindsTo = [ "targetclid" ];
+
+        serviceConfig = {
+          Type = "simple";
+          ExecStart = "${pkgs.targetisns}/bin/target-isns -f -i ${cfg.isns.server}";
         };
       };
     };
