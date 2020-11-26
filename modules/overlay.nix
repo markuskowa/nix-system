@@ -13,6 +13,7 @@
     ./inituser.nix
     ./banner.nix
     ./networkmap.nix
+    ./tmpfsroot.nix
     ./zfs-attrs.nix
   ];
 
