@@ -18,8 +18,6 @@ in rec {
     nhc
     targetisns
     ipdeny-zones
-    pmix
-    openmpi
     slurm
     redfishtool;
 

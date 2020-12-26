@@ -6,8 +6,6 @@ let
 in {
   ipdeny-zones = callPackage ./pkgs/ipdeny-zones {};
 
-  pmix = callPackage ./pkgs/pmix {};
-
   nhc = callPackage ./pkgs/nhc {};
 
   targetisns = callPackage ./pkgs/targetisns {};
