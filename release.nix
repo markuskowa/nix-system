@@ -3,7 +3,7 @@
 } :
 
 let
-  handleTest = t: (import <nixpkgs/nixos/tests/make-test-python.nix>) (import t);
+  handleTest = t: (import "${nixpkgs}/nixos/tests/make-test-python.nix") (import t);
   pkgs = (import nixpkgs) { overlays = [ (import ./default.nix) ]; };
 
   #nixosTests = import "${nixpkgs}/nixos/tests/all-tests.nix" {
