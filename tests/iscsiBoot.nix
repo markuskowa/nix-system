@@ -56,7 +56,7 @@ in {
         ipv4.addresses = lib.mkOverride 0 [{
           address = "192.168.2.2";
           prefixLength = 24;
-         };
+         }];
       };
 
       # required to configure the network in stage 1
