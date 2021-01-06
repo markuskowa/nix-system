@@ -28,6 +28,7 @@ in rec {
     moosefs = handleTest ./tests/moosefs.nix {};
     banner = handleTest ./tests/banner.nix {};
     iscsi = handleTest ./tests/iscsi.nix {};
+    iscsiBoot = handleTest ./tests/iscsiBoot.nix {};
     isns = handleTest ./tests/isns.nix {};
     networkmap = handleTest ./tests/networkmap.nix {};
     sshCA = handleTest ./tests/sshCA.nix {};
