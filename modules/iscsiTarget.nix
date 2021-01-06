@@ -48,7 +48,7 @@ in {
 
     systemd.services = {
       iscsiTarget = {
-        path = with pkgs; [ kmod util-linux ];
+        path = with pkgs; [ kmod utillinux ];
         after = [ "network.target" "local-fs.target" "sys-kernel-config.mount" ];
         requires = [ "sys-kernel-config.mount" "targetclid.service" ];
         wantedBy = [ "multi-user.target" ];
@@ -62,9 +62,10 @@ in {
       };
 
       targetclid = {
-        after = [ "network.target" "sys-kernel-config.mount"];
+        after = [ "network.target" "sys-kernel-config.mount" "modprobe@configfs.service" ];
         before = [ "remote-fs-pre.target" ];
-        requires = [ "sys-kernel-config.mount"  "modprobe@configfs.service" ];
+        wants = [ "modprobe@configfs.service" ];
+        requires = [ "sys-kernel-config.mount" ];
 
         serviceConfig = {
           Type = "simple";
