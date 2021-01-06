@@ -6,6 +6,7 @@
     ./countryfw.nix
     ./infiniband.nix
     ./iscsid.nix
+    ./iscsiBoot.nix
     ./iscsiTarget.nix
     ./isns.nix
     ./moosefs.nix

@@ -31,7 +31,8 @@ in {
       };
 
       initiatorName = mkOption {
-        type = types.str;
+        type = types.strMatching
+          "[iI][qQ][nN][.][0-9]{4}-[0-9]{2}[.][a-zA-Z0-9.-]+(:[a-zA-Z0-9.-]+)?";
         description = "Initiator name.";
         example = "iqn.2004-01.org.nixos.san:initiator";
         default = "iqn.2004-01.org.nixos.san:${config.networking.hostName}";
@@ -99,7 +100,7 @@ in {
 
         serviceConfig = {
           Type = "notify";
-          ExecStart = "${pkgs.openiscsi}/bin/iscsid -f -i ${initiatorName}";
+          ExecStart = "${pkgs.openiscsi}/bin/iscsid -f -i ${if config.boot.initrd.iscsi.ibft then "/sys/firmware/ibft/initiator/initiator-name" else initiatorName}";
           KillMode = "mixed";
           Restart = "on-failure";
         };
