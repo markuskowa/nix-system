@@ -41,7 +41,7 @@ in {
       ++ optional cfg.isns.enable pkgs.targetisns;
 
     systemd.tmpfiles.rules = [
-      "v /etc/target - - - - -"
+      "d /etc/target - - - - -"
     ];
 
     boot.kernelModules = [ "configfs" ];
@@ -50,7 +50,7 @@ in {
       iscsiTarget = {
         path = with pkgs; [ kmod utillinux ];
         after = [ "network.target" "local-fs.target" "sys-kernel-config.mount" ];
-        requires = [ "sys-kernel-config.mount" "targetclid.service" ];
+        requires = [ "sys-kernel-config.mount" ];
         wantedBy = [ "multi-user.target" ];
 
         serviceConfig = {
@@ -65,7 +65,7 @@ in {
         after = [ "network.target" "sys-kernel-config.mount" "modprobe@configfs.service" ];
         before = [ "remote-fs-pre.target" ];
         wants = [ "modprobe@configfs.service" ];
-        requires = [ "sys-kernel-config.mount" ];
+        requires = [ "sys-kernel-config.mount" "targetclid.socket" ];
 
         serviceConfig = {
           Type = "simple";
@@ -75,7 +75,7 @@ in {
       };
 
       target-isns = mkIf cfg.isns.enable {
-        after = [ "network.target" "iscsiTarget.service" ];
+        after = [ "network.target" ];
         wantedBy = [ "remote-fs.target" ];
         requires = [ "targetclid" ];
         bindsTo = [ "targetclid" ];
@@ -87,9 +87,10 @@ in {
       };
     };
 
-    systemd.sockets.targetlcid = {
+    systemd.sockets.targetclid = {
       listenStreams = [ "/run/targetclid.sock" ];
       socketConfig = { SocketMode = "0600"; };
+      partOf = [ "targetclid.service" ];
       wantedBy = [ "sockets.target" ];
     };
   };
