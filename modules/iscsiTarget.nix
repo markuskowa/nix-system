@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ...} :
+{ config, lib, pkgs, ... } :
 
 with lib;
 
@@ -75,10 +75,10 @@ in {
       };
 
       target-isns = mkIf cfg.isns.enable {
-        after = [ "network.target" ];
+        after = [ "network.target" "network-online.target" ];
         wantedBy = [ "remote-fs.target" ];
-        requires = [ "targetclid" ];
-        bindsTo = [ "targetclid" ];
+        requires = [ "targetclid" "iscsiTarget.service" ];
+        bindsTo = [ "targetclid" "iscsiTarget.service" ];
 
         serviceConfig = {
           Type = "simple";
