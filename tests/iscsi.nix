@@ -28,9 +28,6 @@ in {
       imports = [ ../modules/overlay.nix ];
       services.iscsid = {
         enable = true;
-        config = ''
-          node.startup = automatic
-        '';
 
         scanTargets = [ { target = "server"; } ];
 

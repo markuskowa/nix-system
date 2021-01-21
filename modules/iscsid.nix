@@ -9,6 +9,11 @@ let
     InitiatorName=${cfg.initiatorName}
   '';
 
+  settingsFormat = pkgs.formats.keyValue {
+    trueVal = "Yes";
+    falseVal = "No";
+  };
+
 in {
   ###### interface
 
@@ -16,12 +21,14 @@ in {
     services.iscsid = {
       enable = mkEnableOption "iSCSI daemon";
 
-      config = mkOption {
-        type = types.str;
+      settings = mkOption {
+        type = types.submodule {
+          freeformType = settingsFormat.type;
+        };
+
+        default = { "node.startup" = "automatic"; };
+
         description = "Contents of config file (iscsid.conf)";
-        default = ''
-          node.startup = automatic
-        '';
       };
 
       secrets = mkOption {
@@ -93,8 +100,9 @@ in {
         preStart = ''
           # compose config file
           mkdir -p /etc/iscsi
-          echo "${cfg.config}" > /etc/iscsi/iscsid.conf
+          cp "${settingsFormat.generate "iscsid.conf" cfg.settings}" /etc/iscsi/iscsid.conf
           chmod 0600  /etc/iscsi/iscsid.conf
+          echo "" >> /etc/iscsi/iscsid.conf # newline
           cat "${cfg.secrets}" >> /etc/iscsi/iscsid.conf
         '';
 
