@@ -5,6 +5,11 @@ with lib;
 let
   cfg = config.services.isnsd;
 
+  settingsFormat = pkgs.formats.keyValue {
+    trueVal = "1";
+    falseVal = "0";
+  };
+
 in {
   ###### interface
 
@@ -12,27 +17,31 @@ in {
     services.isnsd = {
       enable = mkEnableOption "iSNS daemon";
 
-      initiatorName = mkOption {
-        type = types.str;
-        description = "Initiator name.";
-        example = "iqn.2004-01.org.nixos.san:initiator";
-        default = "iqn.2004-01.org.nixos.san:${config.networking.hostName}";
-      };
+      settings = mkOption {
+        type = types.submodule {
+          freeformType = settingsFormat.type;
 
+          options = {
+            SourceName = mkOption {
+              type = types.str;
+              description = "Initiator name.";
+              example = "iqn.2004-01.org.nixos.san:initiator";
+              default = "iqn.2004-01.org.nixos.san:${config.networking.hostName}";
+            };
 
-      database = mkOption {
-        type = with types; nullOr str;
-        default = null;
-        example = "/var/lib/isns";
-        description = ''
-          Database path. If left empty the database will be in memory only.
-        '';
-      };
+            DefaultDiscoveryDomain = mkOption {
+              type = types.bool;
+              default = false;
+              description = ''
+                Create a default discovery domain
+              '';
+            };
+          };
+        };
 
-      extraConfig = mkOption {
-        type = types.lines;
-        description = "Extra options for isnsd.conf";
-        default = "";
+        default = { };
+
+        description = "Contents of config file (isnsd.conf)";
       };
 
       registerControl = mkOption {
@@ -40,22 +49,6 @@ in {
         default = true;
         description = ''
           Register localhost as control node.
-        '';
-      };
-
-      registrationPeriod = mkOption {
-        type = types.int;
-        default = 3600;
-        description = ''
-          Purge entries after N seconds of inactivity from database.
-        '';
-      };
-
-      defaultDiscoveryDomain = mkOption {
-        type = types.bool;
-        default = false;
-        description = ''
-          Create a default discovery domain
         '';
       };
 
@@ -89,12 +82,7 @@ in {
     };
 
     systemd.services = let
-      isnsdConf = pkgs.writeText "isnsd.conf" ''
-        SourceName = cfg.initiatorName
-        ${optionalString cfg.defaultDiscoveryDomain "DefaultDiscoveryDomain = 1"}
-        ${optionalString (cfg.database != null) "Database = ${cfg.database}"}
-        ${cfg.extraConfig}
-      '';
+      isnsdConf = settingsFormat.generate "isnsd.conf" cfg.settings;
     in {
       isnsd = {
         after = [ "network.target" ];

@@ -65,16 +65,19 @@ in {
     ns =  {
       imports = [ ../modules/overlay.nix ];
 
-      services.isnsd.enable = true;
-      services.isnsd.discoveryDomains = {
-        domain1 = [
-          "iqn.2004-01.org.nixos.san:server1"
-          "iqn.2004-01.org.nixos.san:client1"
-        ];
-        domain2 = [
-          "iqn.2004-01.org.nixos.san:server2"
-          "iqn.2004-01.org.nixos.san:client2"
-        ];
+      services.isnsd = {
+        enable = true;
+        registerControl = true;
+        discoveryDomains = {
+          domain1 = [
+            "iqn.2004-01.org.nixos.san:server1"
+            "iqn.2004-01.org.nixos.san:client1"
+          ];
+          domain2 = [
+            "iqn.2004-01.org.nixos.san:server2"
+            "iqn.2004-01.org.nixos.san:client2"
+          ];
+        };
       };
 
       networking.firewall.allowedTCPPorts = [ 3205 ];
@@ -85,6 +88,10 @@ in {
   testScript = ''
     ns.start()
     ns.wait_for_unit("multi-user.target")
+
+    # Check creation of discovery domains
+    ns.succeed("isnsadm --local --list dds | grep domain1")
+    ns.succeed("isnsadm --local --list dds | grep domain2")
 
     for server in [server1, server2]:
         server.start()
@@ -103,6 +110,11 @@ in {
         server.succeed("test -f /etc/target/saveconfig.json")
         server.succeed("targetcli ls 1>&2")
         server.succeed("targetcli ls | grep 'iqn.2004-01.org.nixos.san:server'")
+
+    # Check registration of nodes
+    ns.succeed("isnsadm --local --list nodes | grep server1")
+    ns.succeed("isnsadm --local --list nodes | grep server2")
+
 
     for client in [client1, client2]:
         client.start()
