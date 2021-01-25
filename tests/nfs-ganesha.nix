@@ -19,37 +19,35 @@ let
 
     services.nfs-ganesha = {
       enable = true;
-      config = ''
+      settings = {
         #
         # Minimal working config
         #
-        NFS_CORE_PARAM {
+        NFS_CORE_PARAM = {
           Enable_UDP = false;
-        }
-        NFS_KRB5 {
+        };
+        NFS_KRB5 = {
           Active_krb5 = false;
-        }
-        EXPORT_DEFAULTS {
-          SecType = sys;
-          Protocols = V4;
-        }
-        EXPORT
-        {
+        };
+        EXPORT_DEFAULTS = {
+          SecType = "sys";
+          Protocols = "V4";
+        };
+        EXPORT = {
           Export_Id = 0;
-          Path = /data;
-          Pseudo = /;
-          Squash = None;
+          Path = "/data";
+          Pseudo = "/";
+          Squash = "None";
 
-          Protocols = V4;
+          Protocols = "V4";
 
-          Access_Type = RW;
+          Access_Type = "RW";
 
-          FSAL
-          {
-            Name = VFS;
-          }
-        }
-      '';
+          FSAL = {
+            Name = "VFS";
+          };
+        };
+      };
     };
   };
 
