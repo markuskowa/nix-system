@@ -55,6 +55,23 @@ in {
     # only NFSv4 is selected
     services.rpcbind.enable = true;
 
+    # Default settings
+    services.nfs-ganesha.settings = {
+      NFS_CORE_PARAM = {
+        Enable_UDP = false;
+      };
+
+      NFS_KRB5 = {
+        Active_krb5 = false;
+      };
+
+      EXPORT_DEFAULTS = {
+        SecType = "sys";
+        Protocols = "V4";
+      };
+    };
+
+    # Service defintion
     systemd.services.ganesha-nfsd = {
       wantedBy = [ "multi-user.target" ];
       requires = [ "network-online.target" ];

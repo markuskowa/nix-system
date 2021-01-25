@@ -23,16 +23,6 @@ let
         #
         # Minimal working config
         #
-        NFS_CORE_PARAM = {
-          Enable_UDP = false;
-        };
-        NFS_KRB5 = {
-          Active_krb5 = false;
-        };
-        EXPORT_DEFAULTS = {
-          SecType = "sys";
-          Protocols = "V4";
-        };
         EXPORT = {
           Export_Id = 0;
           Path = "/data";
