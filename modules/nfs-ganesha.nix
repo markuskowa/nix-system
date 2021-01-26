@@ -24,7 +24,7 @@ let
         (listOf valueType)
         (attrsOf valueType)
       ] // {
-        description = "Ganesha config file";
+        description = "Ganesha config file format";
       };
     in attrsOf (attrsOf valueType);
 
@@ -82,8 +82,9 @@ in {
       '';
 
       serviceConfig = {
+        RuntimeDirectory = "nfs-ganesha";
         Type = "forking";
-        ExecStart = "${pkgs.nfs-ganesha}/bin/ganesha.nfsd -p /run/ganesha.pid -f ${
+        ExecStart = "${pkgs.nfs-ganesha}/bin/ganesha.nfsd -p /run/nfs-ganesha/ganesha.pid -f ${
           formatter.generate "ganesha.conf" cfg.settings}";
       };
     };
