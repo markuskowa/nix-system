@@ -31,7 +31,7 @@
 
     client = { ... } :
     {
-      users.users.testUser = {};
+      users.users.testUser.isNormalUser = true;
 
       environment.etc ={
         dummy-ssh-u = {
