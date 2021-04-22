@@ -1,14 +1,14 @@
-{ stdenvNoCC, fetchFromGitHub } :
+{ stdenvNoCC, lib, fetchFromGitHub } :
 
 stdenvNoCC.mkDerivation rec {
   pname = "ipdeny";
-  version = "20210315";
+  version = "20210422";
 
   src = fetchFromGitHub {
     owner = "markuskowa";
     repo = "ipdeny-zones";
     rev = version;
-    sha256 = "1king2ksgfpv3v9h027hqv3g1rn1xl3adhdlg1pqxj9mir9ikvdi";
+    sha256 = "0qcf5cap3y4ys8mnkfyasmhs57nj8cwma326zws5ixx965jf11xl";
   };
 
   installPhase = ''
@@ -16,7 +16,7 @@ stdenvNoCC.mkDerivation rec {
     cp -r * $out
   '';
 
-  meta = with stdenvNoCC.lib; {
+  meta = with lib; {
     description = "Lists of IP address ranges for all countries";
     maintainters = [ maintainers.markuskowa ];
     homepage = "https://github.com/markuskowa/ipdeny-zones";
