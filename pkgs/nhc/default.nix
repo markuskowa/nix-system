@@ -1,4 +1,4 @@
-{ stdenv, fetchFromGitHub, autoreconfHook } :
+{ stdenv, lib, fetchFromGitHub, autoreconfHook } :
 let
   version = "1.4.2";
 
@@ -28,7 +28,7 @@ in stdenv.mkDerivation {
 
   nativeBuildInputs = [ autoreconfHook ];
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "LBNL Node Health Check";
     homepage = "https://github.com/mej/nhc";
     license = licenses.bsd3;
