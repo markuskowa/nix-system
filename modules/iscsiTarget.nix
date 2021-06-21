@@ -48,7 +48,7 @@ in {
 
     systemd.services = {
       iscsiTarget = {
-        path = with pkgs; [ kmod utillinux ];
+        path = with pkgs; [ kmod util-linux ];
         after = [ "network.target" "local-fs.target" "sys-kernel-config.mount" ];
         requires = [ "sys-kernel-config.mount" ];
         wantedBy = [ "multi-user.target" ];

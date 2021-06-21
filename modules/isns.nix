@@ -75,7 +75,7 @@ in {
 
   config = mkIf cfg.enable {
 
-    environment.systemPackages = [ pkgs.openisns ];
+    environment.systemPackages = [ pkgs.open-isns ];
 
     environment.etc."isns/isnsadm.conf" = {
       text = "";
@@ -91,15 +91,15 @@ in {
 
         serviceConfig = {
           Type = "simple";
-          ExecStart = "${pkgs.openisns}/bin/isnsd -f -c ${isnsdConf}";
+          ExecStart = "${pkgs.open-isns}/bin/isnsd -f -c ${isnsdConf}";
         };
 
         postStart = ''
           sleep 1
-          ${optionalString cfg.registerControl "${pkgs.openisns}/bin/isnsadm --local --register control"}
+          ${optionalString cfg.registerControl "${pkgs.open-isns}/bin/isnsadm --local --register control"}
 
           ${concatStringsSep "\n" (mapAttrsToList (name: members:
-              "${pkgs.openisns}/bin/isnsadm --local --dd-register dd-name=${name} " +
+              "${pkgs.open-isns}/bin/isnsadm --local --dd-register dd-name=${name} " +
                 (concatMapStringsSep " " (member-name: "member-name=${member-name}") members)
             ) cfg.discoveryDomains )
           }
