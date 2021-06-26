@@ -8,8 +8,6 @@ in {
 
   nhc = callPackage ./pkgs/nhc {};
 
-  targetisns = callPackage ./pkgs/targetisns {};
-
   redfishtool = callPackage ./pkgs/redfishtool {};
 
   formats = super.formats // {
