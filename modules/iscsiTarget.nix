@@ -38,7 +38,7 @@ in {
   config = mkIf cfg.enable {
 
     environment.systemPackages = [ pkgs.targetcli ]
-      ++ optional cfg.isns.enable pkgs.targetisns;
+      ++ optional cfg.isns.enable pkgs.target-isns;
 
     systemd.tmpfiles.rules = [
       "d /etc/target - - - - -"
@@ -82,7 +82,7 @@ in {
 
         serviceConfig = {
           Type = "simple";
-          ExecStart = "${pkgs.targetisns}/bin/target-isns -f -i ${cfg.isns.server}";
+          ExecStart = "${pkgs.target-isns}/bin/target-isns -f -i ${cfg.isns.server}";
         };
       };
     };

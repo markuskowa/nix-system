@@ -16,7 +16,7 @@ in rec {
   inherit (pkgs)
     nfs-ganesha
     nhc
-    targetisns
+    target-isns
     ipdeny-zones
     slurm
     redfishtool;
