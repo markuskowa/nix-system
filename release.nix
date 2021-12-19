@@ -31,6 +31,7 @@ in rec {
     iscsiBoot = handleTest ./tests/iscsiBoot.nix {};
     isns = handleTest ./tests/isns.nix {};
     networkmap = handleTest ./tests/networkmap.nix {};
+    geoblocking = handleTest ./tests/geoblocking.nix {};
     sshCA = handleTest ./tests/sshCA.nix {};
     zfsAttrs = handleTest ./tests/zfs-attr.nix {};
     userInit = handleTest ./tests/userInit.nix;
