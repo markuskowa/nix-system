@@ -50,8 +50,8 @@ let
       ExecStop   = "${pkgs.moosefs}/bin/mfs${name} -c ${configFile} stop";
       ExecReload = "${pkgs.moosefs}/bin/mfs${name} -c ${configFile} reload";
       #PIDFile = "${dataPath}/.mfs${name}.lock";
-      TimeOutStartSec = 300;
-      TimeOutStopSec = 300;
+      TimeoutStartSec = 600;
+      TimeoutStopSec = 600;
     };
   };
 
