@@ -55,8 +55,8 @@ in {
 
         serviceConfig = {
           Type = "oneshot";
-          ExecStart = "${pkgs.pythonPackages.rtslib}/bin/targetctl restore ${optionalString (cfg.config != null) "${pkgs.writeText "targetcli.json" (toJSON cfg.config)}"}";
-          ExecStop = "${pkgs.pythonPackages.rtslib}/bin/targetctl clear";
+          ExecStart = "${pkgs.python3Packages.rtslib}/bin/targetctl restore ${optionalString (cfg.config != null) "${pkgs.writeText "targetcli.json" (toJSON cfg.config)}"}";
+          ExecStop = "${pkgs.python3Packages.rtslib}/bin/targetctl clear";
           RemainAfterExit=true;
         };
       };
