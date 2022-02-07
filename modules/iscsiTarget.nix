@@ -77,8 +77,8 @@ in {
       target-isns = mkIf cfg.isns.enable {
         after = [ "network.target" "network-online.target" "iscsiTarget.service" ];
         wantedBy = [ "remote-fs.target" ];
-        requires = [ "targetclid" "iscsiTarget.service" ];
-        bindsTo = [ "targetclid" "iscsiTarget.service" ];
+        requires = [ "targetclid.service" "iscsiTarget.service" ];
+        bindsTo = [ "targetclid.service" "iscsiTarget.service" ];
 
         serviceConfig = {
           Type = "simple";
