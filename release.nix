@@ -25,7 +25,6 @@ in rec {
   tests = {
     infiniband = handleTest ./tests/infiniband.nix {};
     nfs-ganesha = handleTest ./tests/nfs-ganesha.nix {};
-    moosefs = handleTest ./tests/moosefs.nix {};
     banner = handleTest ./tests/banner.nix {};
     iscsi = handleTest ./tests/iscsi.nix {};
     iscsiBoot = handleTest ./tests/iscsiBoot.nix {};
@@ -42,6 +41,7 @@ in rec {
       borgbackup
       influxdb
       grafana
+      moosefs
       redmine
       slurm
       telegraf;
@@ -60,6 +60,7 @@ in rec {
       "upstreamTests.borgbackup"
       "upstreamTests.influxdb"
       "upstreamTests.grafana"
+      "upstreamTests.moosefs"
       "upstreamTests.redmine.mysql"
       "upstreamTests.redmine.pgsql"
       "upstreamTests.slurm"
