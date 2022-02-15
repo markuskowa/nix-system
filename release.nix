@@ -51,7 +51,6 @@ in rec {
     name = "tests";
     constituents = [
       "tests.nfs-ganesha"
-      "tests.moosefs"
       "tests.banner"
       "tests.sshCA"
       "tests.networkmap"
