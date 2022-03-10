@@ -14,11 +14,10 @@ let
 in rec {
   # Evaluate overlay packages
   inherit (pkgs)
-    nfs-ganesha
     nhc
     target-isns
     ipdeny-zones
-    slurm
+    slurm-spank-stunnel
     redfishtool;
 
   # Tests
