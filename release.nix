@@ -14,6 +14,7 @@ let
 in rec {
   # Evaluate overlay packages
   inherit (pkgs)
+    enroot
     nhc
     target-isns
     ipdeny-zones

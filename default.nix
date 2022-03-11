@@ -4,6 +4,8 @@ let
   callPackage = super.callPackage;
 
 in {
+  enroot = callPackage ./pkgs/enroot {};
+
   ipdeny-zones = callPackage ./pkgs/ipdeny-zones {};
 
   nhc = callPackage ./pkgs/nhc {};
