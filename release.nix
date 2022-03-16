@@ -19,6 +19,7 @@ in rec {
     target-isns
     ipdeny-zones
     slurm-spank-stunnel
+    slurm-spank-pyxis
     redfishtool;
 
   # Tests

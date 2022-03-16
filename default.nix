@@ -14,6 +14,8 @@ in {
 
   slurm-spank-stunnel = callPackage ./pkgs/slurm-spank-stunnel {};
 
+  slurm-spank-pyxis = callPackage ./pkgs/slurm-spank-pyxis {};
+
   formats = super.formats // {
     keyValue = import ./pkgs/formater { inherit (super) pkgs lib; };
   };
