@@ -35,6 +35,7 @@ in rec {
     sshCA = handleTest ./tests/sshCA.nix {};
     zfsAttrs = handleTest ./tests/zfs-attr.nix {};
     userInit = handleTest ./tests/userInit.nix;
+    slurm = handleTest ./tests/slurm.nix {};
   };
 
   upstreamTests = {
