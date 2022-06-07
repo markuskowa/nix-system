@@ -69,21 +69,21 @@ let
 
   client = { lib, pkgs, ... } : {
     imports = [ ../modules/overlay.nix ];
+
     networking.firewall.enable = true;
 
     services.beegfs2.client = {
       enable = true;
       settings = {
         sysMgmtdHost = "mgmtd";
-        storeMetaDirectory = "/data";
-        storeAllowFirstRunInit = true;
       };
     };
 
     fileSystems = lib.mkVMOverride {
       "/data" = {
-        device = "server:/";
-       fsType = "nfs4";
+        device = "beegfs_nodev";
+        fsType = "beegfs";
+        options = [ "cfgFile=/etc/beegfs/beegfs-helperd.conf" "_netdev" ];
       };
     };
   };
@@ -101,17 +101,20 @@ in {
   testScript = ''
     mgmtd.wait_for_unit("beegfs-mgmtd.service")
     meta.wait_for_unit("beegfs-meta.service")
-    # storage.wait_for_unit("beegfs-storage.service")
+    storage.wait_for_unit("beegfs-storage.service")
 
     # Check if clients can reach and mount the FS
     for client in [client1, client2]:
       client.wait_for_unit("multi-user.target")
 
     # R/W test between clients
-    # client1.wait_for_unit("data.mount")
-    # client2.wait_for_unit("data.mount")
+    client1.wait_for_unit("data.mount")
+    client2.wait_for_unit("data.mount")
 
-    #client1.succeed("echo test > /data/file1")
-    #client2.succeed("grep test /data/file1")
+    client1.succeed("echo test > /data/file1")
+    client2.succeed("grep test /data/file1")
+
+    #import time
+    #time.sleep(3600)
   '';
 }

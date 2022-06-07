@@ -25,7 +25,7 @@ let
     in attrsOf valueType;
 
     generate = name: config:
-      pkgs.writeText name (attrsToString config);
+      pkgs.writeText name ((attrsToString config) + "\n");
    };
 
   service = name: cfgFile: {
@@ -121,9 +121,8 @@ in {
       source = cfgFile "mgmtd";
     };
 
-    boot.kernelModules = mkIf cfg.client.enable [
-      "beegfs"
-    ];
+    boot.extraModulePackages = mkIf cfg.client.enable [ pkgs.beegfs-modules ];
+    boot.kernelModules = mkIf cfg.client.enable [ "beegfs" ];
 
     environment.systemPackages = [ pkgs.beegfs ];
   };

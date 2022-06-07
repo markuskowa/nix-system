@@ -25,5 +25,7 @@ in {
   linuxPackages = super.linuxPackages // {
     beegfs = super.linuxPackages.callPackage ./pkgs/beegfs/module.nix { };
   };
+
+  beegfs-modules = self.linuxPackages.callPackage ./pkgs/beegfs/module.nix { };
 }
 
