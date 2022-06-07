@@ -14,17 +14,20 @@ let
 in rec {
   # Evaluate overlay packages
   inherit (pkgs)
+    beegfs
     nhc
     target-isns
     ipdeny-zones
     slurm-spank-stunnel
     redfishtool;
 
+    beegfs-client = pkgs.linuxPackages.beegfs;
+
   # Tests
   tests = {
+    beegfs = handleTest ./tests/beegfs.nix {};
     infiniband = handleTest ./tests/infiniband.nix {};
     nfs-ganesha = handleTest ./tests/nfs-ganesha.nix {};
-    moosefs = handleTest ./tests/moosefs.nix {};
     banner = handleTest ./tests/banner.nix {};
     iscsi = handleTest ./tests/iscsi.nix {};
     iscsiBoot = handleTest ./tests/iscsiBoot.nix {};
@@ -41,6 +44,7 @@ in rec {
       borgbackup
       influxdb
       grafana
+      moosefs
       redmine
       slurm
       telegraf;
@@ -50,7 +54,6 @@ in rec {
     name = "tests";
     constituents = [
       "tests.nfs-ganesha"
-      "tests.moosefs"
       "tests.banner"
       "tests.sshCA"
       "tests.networkmap"
