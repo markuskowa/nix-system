@@ -1,0 +1,21 @@
+diff --git a/client_module/build/Makefile b/client_module/build/Makefile
+index 219726f..b213164 100644
+--- a/client_module/build/Makefile
++++ b/client_module/build/Makefile
+@@ -159,7 +159,7 @@ endif
+ 
+ 
+ all: module
+-	@ /bin/true
++	@ true
+ 
+ module: $(TARGET_ALL_DEPS)
+ 	@if [ -z "$(KDIR_PRUNED_HEAD)" ]; then \
+@@ -226,7 +226,6 @@ endif
+ 
+ install:
+ 	install -D -m 644 $(TARGET).ko $(KMOD_INST_DIR)/$(TARGET).ko
+-	depmod -a $(KRELEASE)
+ 
+ clean:
+ 	rm -f *~ .${TARGET}??*

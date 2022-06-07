@@ -3,6 +3,7 @@
 {
   # Import all the modules from the overlay
   imports = [
+    ./beegfs.nix
     ./countryfw.nix
     ./infiniband.nix
     ./iscsid.nix

@@ -19,5 +19,13 @@ in {
   formats = super.formats // {
     keyValue = import ./pkgs/formater { inherit (super) pkgs lib; };
   };
+
+  beegfs = callPackage ./pkgs/beegfs { };
+
+  linuxPackages = super.linuxPackages // {
+    beegfs = super.linuxPackages.callPackage ./pkgs/beegfs/module.nix { };
+  };
+
+  beegfs-modules = self.linuxPackages.callPackage ./pkgs/beegfs/module.nix { };
 }
 
