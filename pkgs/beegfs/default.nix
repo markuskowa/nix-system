@@ -40,6 +40,10 @@ in stdenv.mkDerivation ({
   postInstall = ''
     mkdir -p $out/share/beegfs
     cp ../LICENSE.txt $out/share/beegfs
+
+    # missing config files
+    cp ../client_module/build/dist/etc/beegfs-client.conf $out/etc/beegfs
+    cp ../helperd/build/dist/etc/beegfs-helperd.conf $out/etc/beegfs
   '';
 
   meta = with lib; {
