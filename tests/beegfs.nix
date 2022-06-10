@@ -41,6 +41,7 @@ let
     networking.firewall.allowedTCPPorts = [ 8005 ];
     networking.firewall.allowedUDPPorts = [ 8005 ];
 
+    services.beegfs2.mgmtdHost = "mgmtd";
     services.beegfs2.meta = {
       enable = true;
       settings = {
@@ -57,10 +58,10 @@ let
     networking.firewall.allowedTCPPorts = [ 8003 ];
     networking.firewall.allowedUDPPorts = [ 8003 ];
 
+    services.beegfs2.mgmtdHost = "mgmtd";
     services.beegfs2.storage= {
       enable = true;
       settings = {
-        sysMgmtdHost = "mgmtd";
         storeStorageDirectory = "/data";
         storeAllowFirstRunInit = true;
       };
@@ -72,19 +73,10 @@ let
 
     networking.firewall.enable = true;
 
+    services.beegfs2.mgmtdHost = "mgmtd";
     services.beegfs2.client = {
       enable = true;
-      settings = {
-        sysMgmtdHost = "mgmtd";
-      };
-    };
-
-    fileSystems = lib.mkVMOverride {
-      "/data" = {
-        device = "beegfs_nodev";
-        fsType = "beegfs";
-        options = [ "cfgFile=/etc/beegfs/beegfs-helperd.conf" "_netdev" ];
-      };
+      mountPoint = "/data";
     };
   };
 
@@ -109,12 +101,9 @@ in {
 
     # R/W test between clients
     client1.wait_for_unit("data.mount")
-    client2.wait_for_unit("data.mount")
-
     client1.succeed("echo test > /data/file1")
-    client2.succeed("grep test /data/file1")
 
-    #import time
-    #time.sleep(3600)
+    client2.wait_for_unit("data.mount")
+    client2.succeed("grep test /data/file1")
   '';
 }

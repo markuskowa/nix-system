@@ -38,7 +38,7 @@ let
 
     serviceConfig = {
       Type = "simple";
-      ExecStart = "${pkgs.beegfs}/bin/beegfs-${name} cfgFile=${cfgFile} runDaemonized=false";
+      ExecStart = "${pkgs.beegfs}/bin/beegfs-${name} cfgFile=${cfgFile}";
 
       # If the sysTargetOfflineTimeoutSecs in beegfs-mgmtd.conf is set over 240, this value needs to be
       # adjusted accordingly. Recommendation: sysTargetOfflineTimeoutSecs + 60
@@ -53,6 +53,18 @@ in {
   ###### interface
 
   options.services.beegfs2 = {
+    mgmtdHost = mkOption {
+      type = types.str;
+      default = "";
+      description = "Default setting for management host";
+    };
+
+    connAuthFile = mkOption {
+      type = with types; nullOr str;
+      default = null;
+      description = "Path to shared secret";
+    };
+
     mgmtd = {
       enable = mkEnableOption "BeeGFS managment daemon";
 
@@ -86,7 +98,27 @@ in {
     client = {
       enable = mkEnableOption "BeeGFS client";
 
+      mountPoint = mkOption {
+        type = with types; nullOr str;
+        default = null;
+        description = "If set, filesystem will be mounted here";
+        example = "/beegfs";
+      };
+
+      mountOptions = mkOption {
+        type = with types; str;
+        default = "";
+        description = "Additional mount options";
+        example = "noatime";
+      };
+
       settings = mkOption {
+        type = formatter.type;
+        default = {};
+        description = "Contents of config file";
+      };
+
+      helperd.settings = mkOption {
         type = formatter.type;
         default = {};
         description = "Contents of config file";
@@ -108,18 +140,55 @@ in {
       beegfs-storage = mkIf cfg.storage.enable (service "storage" (cfgFile "storage"));
 
       beegfs-helperd = mkIf cfg.client.enable (service "helperd"
-          (formatter.generate "beegfs-helperd.conf" cfg.client.settings));
+          (formatter.generate "beegfs-helperd.conf" cfg.client.helperd.settings));
     };
 
-    environment.etc."beegfs/beegfs-helperd.conf" = mkIf cfg.client.enable {
+    # Set some defaults for config files
+    services.beegfs2.mgmtd.settings = {
+      runDaemonized = false;
+      connAuthFile = mkIf (cfg.connAuthFile != null) cfg.connAuthFile;
+    };
+
+    services.beegfs2.meta.settings = {
+      sysMgmtdHost = mkDefault cfg.mgmtdHost;
+      runDaemonized = false;
+      connAuthFile = mkIf (cfg.connAuthFile != null) cfg.connAuthFile;
+    };
+
+    services.beegfs2.storage.settings = {
+      sysMgmtdHost = mkDefault cfg.mgmtdHost;
+      runDaemonized = false;
+      connAuthFile = mkIf (cfg.connAuthFile != null) cfg.connAuthFile;
+    };
+
+    services.beegfs2.client.settings = {
+      sysMgmtdHost = mkDefault cfg.mgmtdHost;
+      connAuthFile = mkIf (cfg.connAuthFile != null) cfg.connAuthFile;
+    };
+
+    services.beegfs2.client.helperd.settings = {
+      sysMgmtdHost = mkDefault cfg.mgmtdHost;
+      runDaemonized = false;
+      connAuthFile = mkIf (cfg.connAuthFile != null) cfg.connAuthFile;
+    };
+
+    systemd.mounts = mkIf (cfg.client.mountPoint != null)
+    [{
+      what = "beegfs_nodev";
+      where = cfg.client.mountPoint;
+      type = "beegfs";
+      options = "cfgFile=${cfgFile "client"},_netdev"  + "," +  cfg.client.mountOptions;
+      requires = [ "beegfs-helperd.service" "network-online.target" ];
+      after = [ "beegfs-helperd.service" ];
+      wantedBy = [ "multi-user.target" ];
+    }];
+
+    # Needed by command line tools
+    environment.etc."beegfs/beegfs-client.conf" = mkIf cfg.client.enable {
       enable = true;
       source = cfgFile "client";
     };
 
-    environment.etc."beegfs/beegfs-mgmtd.conf" = mkIf cfg.client.enable {
-      enable = true;
-      source = cfgFile "mgmtd";
-    };
 
     boot.extraModulePackages = mkIf cfg.client.enable [ pkgs.beegfs-modules ];
     boot.kernelModules = mkIf cfg.client.enable [ "beegfs" ];
