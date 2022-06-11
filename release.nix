@@ -36,6 +36,7 @@ in rec {
     iscsiBoot = handleTest ./tests/iscsiBoot.nix {};
     isns = handleTest ./tests/isns.nix {};
     networkmap = handleTest ./tests/networkmap.nix {};
+    moosefs = handleTest ./tests/moosefs.nix {};
     geoblocking = handleTest ./tests/geoblocking.nix {};
     sshCA = handleTest ./tests/sshCA.nix {};
     zfsAttrs = handleTest ./tests/zfs-attr.nix {};
@@ -47,7 +48,6 @@ in rec {
       borgbackup
       influxdb
       grafana
-      moosefs
       redmine
       slurm
       telegraf;
@@ -58,6 +58,7 @@ in rec {
     constituents = [
       "tests.nfs-ganesha"
       "tests.banner"
+      "tests.moosefs"
       "tests.sshCA"
       "tests.networkmap"
       "tests.zfsAttrs"
