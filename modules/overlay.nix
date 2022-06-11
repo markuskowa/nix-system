@@ -9,6 +9,7 @@
     ./iscsiBoot.nix
     ./iscsiTarget.nix
     ./isns.nix
+    ./moosefs-cgiserv.nix
     ./nfs-ganesha.nix
     ./inituser.nix
     ./banner.nix
