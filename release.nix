@@ -4,7 +4,10 @@
 
 let
   handleTest = t: (import "${nixpkgs}/nixos/tests/make-test-python.nix") (import t);
-  pkgs = (import nixpkgs) { overlays = [ (import ./default.nix) ]; };
+  pkgs = (import nixpkgs) {
+    overlays = [ (import ./default.nix) ];
+    config.allowUnfree = true;
+  };
 
   #nixosTests = import "${nixpkgs}/nixos/tests/all-tests.nix" {
   #  inherit pkgs system;

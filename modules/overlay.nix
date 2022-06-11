@@ -21,4 +21,5 @@
   ];
 
   nixpkgs.overlays = [ (import ../default.nix) ];
+  nixpkgs.config.allowUnfree = true;
 }
