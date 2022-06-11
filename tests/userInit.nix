@@ -38,6 +38,8 @@
 
 
   testScript = ''
+    import os
+
     server.wait_for_unit("sshd")
 
     # Check for extra dir
