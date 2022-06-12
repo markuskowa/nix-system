@@ -32,10 +32,8 @@ in {
       after = [ "network.target" "network-online.target" ];
 
       serviceConfig = {
-        Type = "simple";
-        ExecStart = "${pkgs.moosefs}/bin/mfscgiserv -f
-          -P ${toString cfg.cgiserv.port}
-          ${optionalString (cfg.cgiserv.bindHost != null) "-H ${cfg.cgiserv.bindHost}"}";
+        Type = "forking";
+        ExecStart = "${pkgs.moosefs}/bin/mfscgiserv -P ${toString cfg.cgiserv.port} ${optionalString (cfg.cgiserv.bindHost != null) "-H ${cfg.cgiserv.bindHost}"}";
         User = "moosefs";
       };
     };
