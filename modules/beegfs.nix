@@ -189,8 +189,11 @@ in {
       source = cfgFile "client";
     };
 
+    boot.kernelPackages = pkgs.linuxPackages;
+    boot.extraModulePackages = mkIf cfg.client.enable [
+      (pkgs.linuxPackages.beegfs)
+    ];
 
-    boot.extraModulePackages = mkIf cfg.client.enable [ pkgs.beegfs-modules ];
     boot.kernelModules = mkIf cfg.client.enable [ "beegfs" ];
 
     environment.systemPackages = [ pkgs.beegfs ];
