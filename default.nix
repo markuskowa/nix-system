@@ -22,10 +22,10 @@ in {
 
   beegfs = callPackage ./pkgs/beegfs { };
 
-  linuxPackages = super.linuxPackages // {
-    beegfs = super.linuxPackages.callPackage ./pkgs/beegfs/module.nix { };
+  linuxPackages_5_10 = super.linuxPackages_5_10 // {
+    beegfs = super.linuxPackages_5_10.callPackage ./pkgs/beegfs/module.nix { };
   };
 
-  beegfs-modules = self.linuxPackages.callPackage ./pkgs/beegfs/module.nix { };
+  beegfs-modules = self.linuxPackages_5_10.callPackage ./pkgs/beegfs/module.nix { };
 }
 
