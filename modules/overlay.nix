@@ -17,10 +17,8 @@
     ./networkmap.nix
     ./tmpfsroot.nix
     ./zfs-attrs.nix
-    ./slurm.nix
   ];
 
-  disabledModules = [ "services/computing/slurm/slurm.nix" ];
   nixpkgs.overlays = [ (import ../default.nix) ];
   nixpkgs.config.allowUnfree = true;
 }
