@@ -189,7 +189,7 @@ in {
       source = cfgFile "client";
     };
 
-    boot.kernelPackages = pkgs.linuxPackages;
+    #boot.kernelPackages = pkgs.linuxPackages;
     boot.extraModulePackages = mkIf cfg.client.enable [
       (pkgs.linuxPackages.beegfs)
     ];
@@ -197,6 +197,11 @@ in {
     boot.kernelModules = mkIf cfg.client.enable [ "beegfs" ];
 
     environment.systemPackages = [ pkgs.beegfs ];
+
+    nixpkgs.overlays = mkIf cfg.client.enable [(
+        self: super: {
+          beegfs-modules = boot.kernelPackages.beegfs.override { kernel = boot.kernelPackages.kernel; };
+    })];
   };
 }
 
