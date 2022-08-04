@@ -26,11 +26,11 @@ in rec {
     slurm-spank-pyxis
     redfishtool;
 
-    beegfs-client = pkgs.linuxPackages.beegfs;
+    # beegfs-client = pkgs.linuxPackages.beegfs;
 
   # Tests
   tests = {
-    beegfs = handleTest ./tests/beegfs.nix {};
+    # beegfs = handleTest ./tests/beegfs.nix {};
     infiniband = handleTest ./tests/infiniband.nix {};
     nfs-ganesha = handleTest ./tests/nfs-ganesha.nix {};
     banner = handleTest ./tests/banner.nix {};
@@ -42,7 +42,7 @@ in rec {
     sshCA = handleTest ./tests/sshCA.nix {};
     zfsAttrs = handleTest ./tests/zfs-attr.nix {};
     userInit = handleTest ./tests/userInit.nix;
-    slurm = handleTest ./tests/slurm.nix {};
+    # slurm = handleTest ./tests/slurm.nix {};
   };
 
   upstreamTests = {
