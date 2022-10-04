@@ -15,7 +15,7 @@ python3Packages.buildPythonApplication rec {
 
   meta = with lib; {
     description = "RESTful API for Data Center Hardware Management";
-    maintainters = [ maintainers.markuskowa ];
+    maintainers = [ maintainers.markuskowa ];
     license = licenses.bsd3;
     homepage = "https://github.com/DMTF/Redfishtool";
   };

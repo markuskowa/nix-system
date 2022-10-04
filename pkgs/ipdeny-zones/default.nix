@@ -18,7 +18,7 @@ stdenvNoCC.mkDerivation rec {
 
   meta = with lib; {
     description = "Lists of IP address ranges for all countries";
-    maintainters = [ maintainers.markuskowa ];
+    maintainers = [ maintainers.markuskowa ];
     homepage = "https://github.com/markuskowa/ipdeny-zones";
   };
 }
