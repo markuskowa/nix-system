@@ -2,14 +2,14 @@ fetchFromGitLab:
 
 rec {
   pname = "beegfs";
-  version = "7.3.0";
+  version = "7.3.2";
 
   src = fetchFromGitLab {
     domain = "git.beegfs.io";
     owner = "pub";
     repo = "v7";
     rev = version;
-    sha256 = "0michkxncs0lhn7x8iphgf32fjar1jcjcs05jzl9f7j58y06yl0q";
+    sha256 = "sha256-VM82O1Z07qwdoVnHTYXMBzMZLriN39Ahspsg9kHNoV8=";
   };
 
   dontFixCmake = true;
