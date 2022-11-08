@@ -49,11 +49,11 @@ in rec {
     inherit (pkgs.nixosTests)
       borgbackup
       influxdb
-      grafana
       moosefs
       redmine
       slurm
       telegraf;
+      grafana = pkgs.nixosTests.grafana.basic;
   };
 
   tested = pkgs.releaseTools.aggregate {
