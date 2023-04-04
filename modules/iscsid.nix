@@ -9,7 +9,7 @@ let
     InitiatorName=${cfg.initiatorName}
   '';
 
-  settingsFormat = pkgs.formats.keyValue {
+  settingsFormat = pkgs.formats.keyValueCustom {
     trueVal = "Yes";
     falseVal = "No";
   };

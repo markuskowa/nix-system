@@ -17,7 +17,7 @@ in {
   slurm-spank-pyxis = callPackage ./pkgs/slurm-spank-pyxis {};
 
   formats = super.formats // {
-    keyValue = import ./pkgs/formater { inherit (super) pkgs lib; };
+    keyValueCustom = import ./pkgs/formater { inherit (super) pkgs lib; };
   };
 
   beegfs = callPackage ./pkgs/beegfs { };

@@ -5,7 +5,7 @@ with lib;
 let
   cfg = config.services.isnsd;
 
-  settingsFormat = pkgs.formats.keyValue {
+  settingsFormat = pkgs.formats.keyValueCustom {
     trueVal = "1";
     falseVal = "0";
   };
