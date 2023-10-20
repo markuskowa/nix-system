@@ -56,7 +56,7 @@ in {
       options = [ "defaults" "mode=755" "size=${cfg.size}" ];
     };
 
-    boot.tmpOnTmpfs = mkDefault true;
+    boot.tmp.useTmpfs = mkDefault true;
 
     environment.etc."machine-id" = mkIf cfg.fixMachineId {
       source = "${cfg.persistPath}/etc/machine-id";
