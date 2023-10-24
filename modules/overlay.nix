@@ -16,6 +16,7 @@
     ./banner.nix
     ./networkmap.nix
     ./tmpfsroot.nix
+    ./vxlan.nix
     ./zfs-attrs.nix
   ];
 
