@@ -1,17 +1,17 @@
 { lib, stdenv, fetchFromGitHub
 , autoconf, automake, libtool, makeWrapper
-, jq, parallel, squashfsTools
+, jq, parallel, squashfsTools, libmd
 }:
 
 stdenv.mkDerivation rec {
   pname = "enroot";
-  version = "3.4.0";
+  version = "3.4.1";
 
   src = fetchFromGitHub {
     owner = "NVIDIA";
     repo = "enroot";
     rev = "v${version}";
-    sha256 = "0qignd8rb9wq3h391cybcy7x389dl8jx21brpm19jbm31yij7c77";
+    sha256 = "sha256-lZxzRcyriwwjbQ/DrARCSTo4iY8KmoDJf+pd/ZSLqWM=";
     fetchSubmodules = true;
   };
 
@@ -22,6 +22,7 @@ stdenv.mkDerivation rec {
     makeWrapper
   ];
 
+  buildInputs = [ libmd ];
   makeFlags = [ "prefix=${placeholder "out"}"];
 
   postInstall = ''
