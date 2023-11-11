@@ -15,12 +15,12 @@ let
 
     networking.bridges.ve-br.interfaces = [  "ve-0" "vxlan1" ];
 
-    networking.vxlans.vxlan1 = {
+    networking.vlans.vxlan1 = {
       id = 1;
-      dev = "eth1";
+      interface = "eth1";
     };
 
-    networking.firewall.allowedUDPPorts = [ 4789 ]; # VXLAN default port
+    # networking.firewall.allowedUDPPorts = [ 4789 ]; # VXLAN default port
 
     networking.interfaces.ve-0.virtual = true;
     networking.interfaces.eth1.mtu = 1550;
