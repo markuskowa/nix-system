@@ -107,11 +107,11 @@ in {
 
   config = mkIf cfg.db.enable {
     # generate dhcpd entries
-    services.dhcpd4.machines = flatten ( mapAttrsToList ( netName: net:
+    services.kea.dhcp4.settings.reservations = flatten ( mapAttrsToList ( netName: net:
       map ( host: {
-        ethernetAddress = host.mac;
-        hostName = genHostName net host;
-        ipAddress = "${net.subnet}.${toString host.node}";
+        hw-address = host.mac;
+        hostname = genHostName net host;
+        ip-address = "${net.subnet}.${toString host.node}";
       }) ( filter (x: x.mac != null) net.machList )
     ) (filterAttrs (n: v: v.enableDhcpd) cfg.db.networks) );
 
