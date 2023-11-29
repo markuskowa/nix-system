@@ -41,9 +41,9 @@ in rec {
     geoblocking = handleTest ./tests/geoblocking.nix {};
     sshCA = handleTest ./tests/sshCA.nix {};
     zfsAttrs = handleTest ./tests/zfs-attr.nix {};
-    userInit = handleTest ./tests/userInit.nix;
+    userInit = handleTest ./tests/userInit.nix {};
     macsec-psk  = handleTest ./tests/macsec-psk.nix {};
-    vxlan = handleTest ./tests/vxlan.nix;
+    vxlan = handleTest ./tests/vxlan.nix {};
     # slurm = handleTest ./tests/slurm.nix {};
   };
 
