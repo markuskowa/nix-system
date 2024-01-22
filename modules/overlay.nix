@@ -10,6 +10,8 @@
     ./iscsiBoot.nix
     ./iscsiTarget.nix
     ./isns.nix
+    ./macsec.nix
+    ./supplicant.nix
     ./moosefs-cgiserv.nix
     ./nfs-ganesha.nix
     ./inituser.nix

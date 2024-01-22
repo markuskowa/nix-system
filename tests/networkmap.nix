@@ -56,13 +56,15 @@ in {
     in {
       virtualisation.vlans = [ 1 2 ];
 
-      services.dhcpd4 = {
+      services.kea.dhcp4 = {
         enable = true;
-        interfaces = [ "eth1" "eth2" ];
-        extraConfig = with config.networking.db.networks; ''
-          subnet  ${net1.subnet}.0 netmask 255.255.255.0 {}
-          subnet  ${net2.subnet}.0 netmask 255.255.255.0 {}
-        '';
+        settings = {
+          interfaces-config.interfaces = [ "eth1" "eth2" ];
+          subnet4 = with config.networking.db.networks; [
+            { subnet = "${net1.subnet}.0/24"; reservations-global = true; }
+            { subnet = "${net2.subnet}.0/24"; reservations-global = true; }
+          ];
+        };
       };
 
       imports = [ ../modules/overlay.nix networkingCommon ];
@@ -99,7 +101,7 @@ in {
   };
 
   testScript = ''
-    server.wait_for_unit("dhcpd4.service")
+    server.wait_for_unit("kea-dhcp4-server.service")
     # Check MAC addresses
     node1.succeed("ifconfig eth1 | grep aa:22:33:44:af:66")
     node1.succeed("ifconfig eth2 | grep aa:22:33:44:af:68")

@@ -12,8 +12,6 @@ in {
 
   redfishtool = callPackage ./pkgs/redfishtool {};
 
-  slurm-spank-stunnel = callPackage ./pkgs/slurm-spank-stunnel {};
-
   slurm-spank-pyxis = callPackage ./pkgs/slurm-spank-pyxis {};
 
   formats = super.formats // {
