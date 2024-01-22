@@ -1,6 +1,6 @@
-{ lib, stdenv, fetchFromGitHub
+{ lib, stdenv, fetchFromGitHub, which
 , autoconf, automake, libtool, makeWrapper
-, jq, parallel, squashfsTools, libmd
+, jq, parallel, squashfsTools, libmd, libbsd
 }:
 
 stdenv.mkDerivation rec {
@@ -15,11 +15,20 @@ stdenv.mkDerivation rec {
     fetchSubmodules = true;
   };
 
+  preBuild = ''
+    # enroot somehow can not find the gcc compiler
+    # just link to the wrapped gcc
+    mkdir -p deps/dist/musl/bin
+    ln -s `which gcc` deps/dist/musl/bin/musl-gcc
+    ls -l  deps/dist/musl/bin/musl-gcc
+  '';
+
   nativeBuildInputs = [
     autoconf
     automake
     libtool
     makeWrapper
+    which
   ];
 
   buildInputs = [ libmd ];
