@@ -10,17 +10,17 @@ let
     };
   };
 
-  common = {
+  common = { config, ... } : {
     imports = [ ../modules/overlay.nix ];
 
     networking.bridges.ve-br.interfaces = [  "ve-0" "vxlan1" ];
 
-    networking.vlans.vxlan1 = {
+    networking.vxlans.vxlan1 = {
       id = 1;
-      interface = "eth1";
+      dev = "eth1";
     };
 
-    # networking.firewall.allowedUDPPorts = [ 4789 ]; # VXLAN default port
+    networking.firewall.allowedUDPPorts = [ config.networking.vxlans.vxlan1.port ]; # VXLAN default port
 
     networking.interfaces.ve-0.virtual = true;
     networking.interfaces.eth1.mtu = 1550;

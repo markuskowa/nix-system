@@ -23,6 +23,18 @@ in {
           default = 0;
         };
 
+        local = mkOption {
+          description = "Local IP address";
+          type = with types; nullOr str;
+          default = null;
+        };
+
+        remote = mkOption {
+          description = "Remote IP address";
+          type = with types; nullOr str;
+          default = null;
+        };
+
         group = mkOption {
           description = "Multicast group";
           type = types.str;
@@ -36,8 +48,15 @@ in {
         };
 
         dev = mkOption {
+          type = with types; nullOr str;
           description = "Physical interface to bind to";
-          type = types.str;
+          default = null;
+        };
+
+        extraOptions = mkOption {
+          type = with types; str;
+          description = "Extra options for 'ip link add'";
+          default = "";
         };
       };
     }));
@@ -46,10 +65,10 @@ in {
   config.systemd.services = mapAttrs' (name: net:
     nameValuePair ("vxlan-${name}") {
       description = "VXLAN Interface ${name}";
-      wantedBy = [ "network-setup.service" (subsystemDevice net.dev) ];
-      bindsTo = [(subsystemDevice net.dev)];
+      wantedBy = [ "network-setup.service" ] ++ optional (net.dev != null) (subsystemDevice net.dev);
+      bindsTo = optional (net.dev != null) (subsystemDevice net.dev);
       partOf = [ "network-setup.service" ];
-      after = [ "network-pre.target" (subsystemDevice net.dev) ];
+      after = [ "network-pre.target" ] ++ optional (net.dev != null) (subsystemDevice net.dev);
       before = [ "network-setup.service" ];
       serviceConfig.Type = "oneshot";
       serviceConfig.RemainAfterExit = true;
@@ -59,7 +78,10 @@ in {
         ip link show dev "${name}" >/dev/null 2>&1 && ip link delete "${name}"
 
         # Add new interface
-        ip link add ${name} type vxlan id ${toString net.id} group ${net.group} dstport ${toString net.port} dev ${net.dev}
+        ip link add ${name} type vxlan id ${toString net.id} ${optionalString (net.local != null) "local ${net.local}"} \
+          ${optionalString (net.remote == null) "group ${net.group}"} ${optionalString (net.remote != null) "remote ${net.remote}"} \
+          dstport ${toString net.port} \
+          dev ${net.dev} ${net.extraOptions}
       '';
       postStop = ''
         ip link delete "${name}" || true
