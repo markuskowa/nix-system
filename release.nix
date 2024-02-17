@@ -43,6 +43,7 @@ in rec {
     zfsAttrs = handleTest ./tests/zfs-attr.nix {};
     userInit = handleTest ./tests/userInit.nix {};
     macsec-psk  = handleTest ./tests/macsec-psk.nix {};
+    hostapd-radius = handleTest ./tests/hostapd-radius.nix {};
     vxlan = handleTest ./tests/vxlan.nix {};
     # slurm = handleTest ./tests/slurm.nix {};
   };

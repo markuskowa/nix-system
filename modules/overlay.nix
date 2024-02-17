@@ -11,6 +11,8 @@
     ./iscsiTarget.nix
     ./isns.nix
     ./macsec.nix
+    ./hostapd-radius.nix
+    ./hostapd-wired.nix
     ./supplicant.nix
     ./moosefs-cgiserv.nix
     ./nfs-ganesha.nix
