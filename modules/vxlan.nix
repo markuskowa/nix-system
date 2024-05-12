@@ -37,7 +37,7 @@ in {
 
         group = mkOption {
           description = "Multicast group";
-          type = types.str;
+          type = with types; nullOr str;
           default = "239.1.1.1";
         };
 
@@ -79,7 +79,7 @@ in {
 
         # Add new interface
         ip link add ${name} type vxlan id ${toString net.id} ${optionalString (net.local != null) "local ${net.local}"} \
-          ${optionalString (net.remote == null) "group ${net.group}"} ${optionalString (net.remote != null) "remote ${net.remote}"} \
+          ${optionalString (net.remote == null && net.group != null) "group ${net.group}"} ${optionalString (net.remote != null) "remote ${net.remote}"} \
           dstport ${toString net.port} \
           dev ${net.dev} ${net.extraOptions}
       '';
