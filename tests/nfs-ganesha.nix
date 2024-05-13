@@ -74,6 +74,6 @@ in {
     client2.wait_for_unit("data.mount")
 
     client1.succeed("echo test > /data/file1")
-    client2.succeed("grep test /data/file1")
+    client2.wait_until_succeeds("grep test /data/file1")
   '';
 }
