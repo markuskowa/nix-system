@@ -4,6 +4,7 @@
 { ... } :
 
 {
+  name = "Check IB module";
 
   nodes = {
     machine = {
