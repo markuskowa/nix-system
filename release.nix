@@ -17,7 +17,6 @@ let
 in rec {
   # Evaluate overlay packages
   inherit (pkgs)
-    beegfs
     enroot
     nhc
     target-isns
@@ -30,7 +29,6 @@ in rec {
 
   # Tests
   tests = {
-    # beegfs = handleTest ./tests/beegfs.nix {};
     infiniband = handleTest ./tests/infiniband.nix {};
     nfs-ganesha = handleTest ./tests/nfs-ganesha.nix {};
     banner = handleTest ./tests/banner.nix {};
