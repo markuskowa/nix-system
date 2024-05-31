@@ -97,8 +97,8 @@
     client.wait_for_unit("multi-user.target")
     client.wait_for_unit("wpa.service")
 
-    apd.succeed("${pkgs.hostapd}/bin/hostapd_cli all_sta  | grep AUTHORIZED")
-    client.succeed("${pkgs.wpa_supplicant}/bin/wpa_cli status | grep 'EAP state=SUCCESS'")
+    apd.wait_until_succeeds("${pkgs.hostapd}/bin/hostapd_cli all_sta  | grep AUTHORIZED")
+    client.wait_until_succeeds("${pkgs.wpa_supplicant}/bin/wpa_cli status | grep 'EAP state=SUCCESS'")
   '';
 
 }
