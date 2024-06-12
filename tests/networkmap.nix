@@ -61,8 +61,8 @@ in {
         settings = {
           interfaces-config.interfaces = [ "eth1" "eth2" ];
           subnet4 = with config.networking.db.networks; [
-            { subnet = "${net1.subnet}.0/24"; reservations-global = true; }
-            { subnet = "${net2.subnet}.0/24"; reservations-global = true; }
+            { id = 1; subnet = "${net1.subnet}.0/24"; reservations-global = true; }
+            { id = 2; subnet = "${net2.subnet}.0/24"; reservations-global = true; }
           ];
         };
       };
