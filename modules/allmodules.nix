@@ -19,6 +19,7 @@ in {
   iscsiTarget = importModule ./iscsiTarget.nix;
   isns = importModule ./isns.nix;
   macsec = importModule ./macsec.nix;
+  machine-info = ./machine-info.nix;
   moosefsCgiserv = importModule ./moosefs-cgiserv.nix;
   networkmap = importModule ./networkmap.nix;
   nfs-ganesha = importModule ./nfs-ganesha.nix;
