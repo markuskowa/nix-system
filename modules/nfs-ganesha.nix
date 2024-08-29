@@ -11,7 +11,7 @@ let
   valueToString = key: val:
     if isList val then concatStringsSep "," (map (x: valueToString x) val)
     else if isAttrs val then "${key} {\n${attrsToString val}\n}"
-    else if isBool val then (if val then "true" else "false")
+    else if isBool val then (if val then "${key} = true;" else "${key} = false;")
     else "${key} = ${toString val};";
 
   formatter = {
