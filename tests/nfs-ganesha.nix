@@ -37,6 +37,15 @@ let
             Name = "VFS";
           };
         };
+
+        NFSV4 = {
+          # Reduce start-up period for test
+          Grace_Period = 3;
+          Lease_Lifetime = 3;
+
+          # Limit to nfs4.1; nfs4.2 is broken (returns only empty files!).
+          Minor_Versions = "0, 1";
+        };
       };
     };
   };
@@ -47,7 +56,7 @@ let
     fileSystems = lib.mkVMOverride {
       "/data" = {
         device = "server:/";
-       fsType = "nfs4";
+        fsType = "nfs4";
       };
     };
   };
@@ -67,12 +76,12 @@ in {
 
     # Check if clients can reach and mount the FS
     for client in [client1, client2]:
-        client.wait_for_unit("multi-user.target")
+        client.start()
+
+    for client in [client1, client2]:
+      client.wait_for_unit("data.mount")
 
     # R/W test between clients
-    client1.wait_for_unit("data.mount")
-    client2.wait_for_unit("data.mount")
-
     client1.succeed("echo test > /data/file1")
     client2.wait_until_succeeds("grep test /data/file1")
   '';
