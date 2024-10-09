@@ -9,24 +9,6 @@
 
   nodes = {
     server = { ... } : {
-      environment.etc = {
-        dummy-ssh-u = {
-          mode = "0400";
-          user = "testUser";
-          text = builtins.readFile ./testkeys/dummy-ssh;
-        };
-
-        dummy-ssh-r = {
-          mode = "0400";
-          user = "root";
-          text = builtins.readFile ./testkeys/dummy-ssh;
-        };
-      };
-
-      services.openssh.enable = true;
-    };
-
-    node = { ... } : {
       services.openssh = {
         enable = true;
         extraConfig = ''
@@ -34,32 +16,43 @@
           HostCertificate /etc/ssh/ssh_host_ed25519_key-cert.pub
         '';
       };
+    };
 
-      users.users = {
-        root.openssh.authorizedKeys.keys = [
-            (builtins.readFile ./testkeys/dummy-ssh.pub)
-          ];
+    node = { ... } : {
+      services.openssh = {
+        enable = true;
       };
     };
   };
 
   testScript = ''
-    node.wait_for_unit("sshd.service")
+    shared_dir = "/tmp/shared"
+
+    start_all()
+    node.wait_for_unit("multi-user.target")
     server.wait_for_unit("multi-user.target")
-    server.succeed('ssh-keygen -t rsa -N "" -f ca_host_key -I CA')
-    server.succeed(
-        "scp -i /etc/dummy-ssh-r -o 'StrictHostKeyChecking no' node:/etc/ssh/ssh_host_ed25519_key.pub ."
-    )
-    server.succeed("ssh-keygen -s ca_host_key -h -I node ssh_host_ed25519_key.pub")
-    server.succeed(
-        "scp -i /etc/dummy-ssh-r -o 'StrictHostKeyChecking no' ssh_host_ed25519_key-cert.pub node:/etc/ssh/ "
-    )
 
-    # Should fail without trusting the host
-    # $server.fail("rm ~/.ssh/known_hosts; ssh -n -i /etc/dummy-ssh-r node true")
+    # Generate CA certificate
+    server.succeed('ssh-keygen -t rsa -N "" -f {}/ca_host_key -I CA'.format(shared_dir))
 
-    # Now trust the CA
-    server.succeed('echo "@cert-authority * `cat ca_host_key.pub`" > ~/.ssh/known_hosts')
-    server.succeed("ssh -i /etc/dummy-ssh-r node true")
+    # Sign host keys
+    server.succeed("ssh-keygen -s {}/ca_host_key -h -I server /etc/ssh/ssh_host_ed25519_key.pub".format(shared_dir))
+    server.succeed("ssh-keygen -s {}/ca_host_key -h -I server /etc/ssh/ssh_host_rsa_key.pub".format(shared_dir))
+    server.succeed("systemctl restart sshd")
+
+    # Generate client key
+    node.succeed('ssh-keygen -N "" -f {}/root-key'.format(shared_dir))
+
+    # Setup user key
+    # copy(node, "/tmp", server, "/tmp", "key.pub")
+    server.succeed("mkdir -p /root/.ssh; cat {}/root-key.pub > /root/.ssh/authorized_keys".format(shared_dir))
+
+    # Trust CA certificates
+    # copy(server, "/etc/ssh", node, "/tmp", "ca_host_key.pub")
+    node.succeed("mkdir -p /root/.ssh")
+    node.succeed('echo "@cert-authority * $(cat {}/ca_host_key.pub)" > /root/.ssh/known_hosts'.format(shared_dir))
+
+    # Login should succeed and server is accepted by means of CA signature
+    node.succeed('ssh -i {}/root-key -o "StrictHostKeyChecking yes" server true'.format(shared_dir))
   '';
 }
