@@ -67,7 +67,7 @@ in {
 
       EXPORT_DEFAULTS = {
         SecType = "sys";
-        Protocols = "V4";
+        Protocols = "4";
       };
     };
 
