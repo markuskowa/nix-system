@@ -29,7 +29,7 @@ let
           Pseudo = "/";
           Squash = "None";
 
-          Protocols = "V4";
+          Protocols = "4";
 
           Access_Type = "RW";
 
@@ -74,6 +74,7 @@ in {
     client2.wait_for_unit("data.mount")
 
     client1.succeed("echo test > /data/file1")
+    client1.wait_until_succeeds("grep test /data/file1")
     client2.wait_until_succeeds("grep test /data/file1")
   '';
 }
