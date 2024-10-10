@@ -8,8 +8,8 @@ let
 
     targetcli /iscsi/${iqnPfx}:server/tpg1/luns create /backstores/block/vol
     targetcli /iscsi/${iqnPfx}:server/tpg1/acls create ${iqnPfx}:client
-    targetcli /iscsi/${iqnPfx}:server/tpg1/acls/${iqnPfx}:client set auth userid=client
-    targetcli /iscsi/${iqnPfx}:server/tpg1/acls/${iqnPfx}:client set auth password=test
+    # targetcli /iscsi/${iqnPfx}:server/tpg1/acls/${iqnPfx}:client set auth userid=client
+    # targetcli /iscsi/${iqnPfx}:server/tpg1/acls/${iqnPfx}:client set auth password=test
 
     targetcli saveconfig
   '';
@@ -31,7 +31,7 @@ in {
 
         scanTargets = [ { target = "server"; } ];
 
-        secrets = "${secrets}";
+        # secrets = "${secrets}";
       };
     };
 
