@@ -23,7 +23,17 @@ let
         #
         # Minimal working config
         #
-        EXPORT = {
+        NFSV4 = {
+          # Reduce start-up period for test
+          Grace_Period = 3;
+          Lease_Lifetime = 3;
+
+          # Limit to nfs4.1; nfs4.2 is broken (returns only empty files!).
+          Minor_Versions = "0, 1";
+        };
+      };
+      exports = [
+        {
           Export_Id = 0;
           Path = "/data";
           Pseudo = "/";
@@ -36,17 +46,8 @@ let
           FSAL = {
             Name = "VFS";
           };
-        };
-
-        NFSV4 = {
-          # Reduce start-up period for test
-          Grace_Period = 3;
-          Lease_Lifetime = 3;
-
-          # Limit to nfs4.1; nfs4.2 is broken (returns only empty files!).
-          Minor_Versions = "0, 1";
-        };
-      };
+        }
+      ];
     };
   };
 

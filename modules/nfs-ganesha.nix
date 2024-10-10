@@ -28,8 +28,12 @@ let
       };
     in attrsOf (attrsOf valueType);
 
-    generate = name: value:
-      pkgs.writeText name (attrsToString value);
+    generate = name: value: exports:
+      pkgs.writeText name ((attrsToString value) + (concatStringsSep "\n" (map (x:
+        ''EXPORT {
+          ${attrsToString x}
+          }
+        '') exports)));
    };
 
 in {
@@ -43,6 +47,12 @@ in {
         type = formatter.type;
         default = {};
         description = "Contents of config file";
+      };
+
+      exports = mkOption {
+        type = types.listOf types.attrs;
+        default = [];
+        description = "List of exports definitions.";
       };
     };
   };
@@ -58,16 +68,16 @@ in {
     # Default settings
     services.nfs-ganesha.settings = {
       NFS_CORE_PARAM = {
-        Enable_UDP = false;
+        Enable_UDP = mkDefault false;
       };
 
       NFS_KRB5 = {
-        Active_krb5 = false;
+        Active_krb5 = mkDefault false;
       };
 
       EXPORT_DEFAULTS = {
-        SecType = "sys";
-        Protocols = "4";
+        SecType = mkDefault "sys";
+        Protocols = mkDefault "4";
       };
     };
 
@@ -85,7 +95,7 @@ in {
         RuntimeDirectory = "nfs-ganesha";
         Type = "forking";
         ExecStart = "${pkgs.nfs-ganesha}/bin/ganesha.nfsd -p /run/nfs-ganesha/ganesha.pid -f ${
-          formatter.generate "ganesha.conf" cfg.settings}";
+          formatter.generate "ganesha.conf" cfg.settings cfg.exports}";
       };
     };
   };
