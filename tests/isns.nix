@@ -15,7 +15,7 @@ let
         enable = true;
         scanTargets = [ { target="ns"; type="isns"; } ];
 
-        secrets = "${secrets}";
+        # secrets = "${secrets}";
       };
     };
 
@@ -46,8 +46,8 @@ let
 
     targetcli /iscsi/${iqn "server" n}/tpg1/luns create /backstores/block/vol
     targetcli /iscsi/${iqn "server" n}/tpg1/acls create ${iqn "client" n}
-    targetcli /iscsi/${iqn "server" n}/tpg1/acls/${iqn "client" n} set auth userid=client${toString n}
-    targetcli /iscsi/${iqn "server" n}/tpg1/acls/${iqn "client" n} set auth password=test
+    # targetcli /iscsi/${iqn "server" n}/tpg1/acls/${iqn "client" n} set auth userid=client${toString n}
+    # targetcli /iscsi/${iqn "server" n}/tpg1/acls/${iqn "client" n} set auth password=test
 
     targetcli saveconfig
   '';
