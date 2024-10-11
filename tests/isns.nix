@@ -11,11 +11,16 @@ let
 
     in {
       imports = [ ../modules/overlay.nix ];
+
+      # iscsid picks the IPv6 address of server
+      # and tries it first (which fails).
+      networking.enableIPv6 = false;
+
       services.iscsid = {
         enable = true;
         scanTargets = [ { target="ns"; type="isns"; } ];
 
-        # secrets = "${secrets}";
+        secrets = "${secrets}";
       };
     };
 
@@ -28,6 +33,7 @@ let
 
     virtualisation.emptyDiskImages = [ 4096 ];
 
+    networking.enableIPv6 = false;
     networking.firewall.allowedTCPPorts = [ 3260 ];
 
     services.iscsiTarget = {
@@ -46,8 +52,9 @@ let
 
     targetcli /iscsi/${iqn "server" n}/tpg1/luns create /backstores/block/vol
     targetcli /iscsi/${iqn "server" n}/tpg1/acls create ${iqn "client" n}
-    # targetcli /iscsi/${iqn "server" n}/tpg1/acls/${iqn "client" n} set auth userid=client${toString n}
-    # targetcli /iscsi/${iqn "server" n}/tpg1/acls/${iqn "client" n} set auth password=test
+    targetcli /iscsi/${iqn "server" n}/tpg1 set attribute authentication=1
+    targetcli /iscsi/${iqn "server" n}/tpg1/acls/${iqn "client" n} set auth userid=client${toString n}
+    targetcli /iscsi/${iqn "server" n}/tpg1/acls/${iqn "client" n} set auth password=test
 
     targetcli saveconfig
   '';
@@ -119,6 +126,7 @@ in {
     for client in [client1, client2]:
         client.start()
         client.wait_for_unit("multi-user.target")
+        client.wait_for_unit("iscsi.service")
 
         client.wait_for_file("/dev/sda")
 

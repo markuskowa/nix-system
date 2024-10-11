@@ -8,8 +8,9 @@ let
 
     targetcli /iscsi/${iqnPfx}:server/tpg1/luns create /backstores/block/vol
     targetcli /iscsi/${iqnPfx}:server/tpg1/acls create ${iqnPfx}:client
-    # targetcli /iscsi/${iqnPfx}:server/tpg1/acls/${iqnPfx}:client set auth userid=client
-    # targetcli /iscsi/${iqnPfx}:server/tpg1/acls/${iqnPfx}:client set auth password=test
+    targetcli /iscsi/${iqnPfx}:server/tpg1 set attribute authentication=1
+    targetcli /iscsi/${iqnPfx}:server/tpg1/acls/${iqnPfx}:client set auth userid=client
+    targetcli /iscsi/${iqnPfx}:server/tpg1/acls/${iqnPfx}:client set auth password=test
 
     targetcli saveconfig
   '';
@@ -21,17 +22,23 @@ in {
     let
       secrets = pkgs.writeText "iscsid.secrets" ''
         node.session.auth.authmethod = CHAP
+        node.session.auth.chap_algs = SHA256,SHA1,MD5
         node.session.auth.username = client
         node.session.auth.password = test
-      '';
+        '';
     in  {
       imports = [ ../modules/overlay.nix ];
+
+      # iscsid picks the IPv6 address of server
+      # and tries it first (which fails).
+      networking.enableIPv6 = false;
+
       services.iscsid = {
         enable = true;
 
         scanTargets = [ { target = "server"; } ];
 
-        # secrets = "${secrets}";
+        secrets = "${secrets}";
       };
     };
 
@@ -71,7 +78,7 @@ in {
 
     with subtest("Setup initiator"):
         client.start()
-        client.wait_for_unit("multi-user.target")
+        client.wait_for_unit("iscsi.service")
 
         client.wait_for_file("/dev/sda")
 
