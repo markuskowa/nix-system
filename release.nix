@@ -44,6 +44,7 @@ in rec {
     macsec-psk  = handleTest ./tests/macsec-psk.nix {};
     hostapd-radius = handleTest ./tests/hostapd-radius.nix {};
     vxlan = handleTest ./tests/vxlan.nix {};
+    http-boot = handleTest ./tests/http-boot.nix {};
     # slurm = handleTest ./tests/slurm.nix {};
   };
 
