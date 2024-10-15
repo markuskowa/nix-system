@@ -9,6 +9,7 @@ let
     config.allowUnfree = true;
   };
 
+  inherit (pkgs) lib;
   #nixosTests = import "${nixpkgs}/nixos/tests/all-tests.nix" {
   #  inherit pkgs system;
   #  callTest = t: pkgs.lib.hydraJob t.test;
@@ -44,7 +45,7 @@ in rec {
     macsec-psk  = handleTest ./tests/macsec-psk.nix {};
     hostapd-radius = handleTest ./tests/hostapd-radius.nix {};
     vxlan = handleTest ./tests/vxlan.nix {};
-    http-boot = handleTest ./tests/http-boot.nix {};
+    netboot = import ./tests/netboot.nix { inherit lib pkgs; };
     # slurm = handleTest ./tests/slurm.nix {};
   };
 
