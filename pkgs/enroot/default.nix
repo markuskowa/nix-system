@@ -1,17 +1,17 @@
-{ lib, stdenv, fetchFromGitHub, which
+{ lib, stdenv, fetchFromGitHub, which, util-linux
 , autoconf, automake, libtool, makeWrapper
 , jq, parallel, squashfsTools, libmd, libbsd
 }:
 
 stdenv.mkDerivation rec {
   pname = "enroot";
-  version = "3.4.1";
+  version = "3.5.0";
 
   src = fetchFromGitHub {
     owner = "NVIDIA";
     repo = "enroot";
     rev = "v${version}";
-    sha256 = "sha256-lZxzRcyriwwjbQ/DrARCSTo4iY8KmoDJf+pd/ZSLqWM=";
+    sha256 = "sha256-Sw4kfsb0Gi21At2pU8lt5wIfCih7VZ7Zf9/62xBKKRU=";
     fetchSubmodules = true;
   };
 
@@ -28,6 +28,7 @@ stdenv.mkDerivation rec {
     automake
     libtool
     makeWrapper
+    util-linux
     which
   ];
 
