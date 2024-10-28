@@ -36,6 +36,7 @@ in rec {
     iscsi = handleTest ./tests/iscsi.nix {};
     iscsiBoot = handleTest ./tests/iscsiBoot.nix {};
     isns = handleTest ./tests/isns.nix {};
+    kea = handleTest ./tests/kea.nix {};
     networkmap = handleTest ./tests/networkmap.nix {};
     machine-info = handleTest ./tests/machine-info.nix {};
     geoblocking = handleTest ./tests/geoblocking.nix {};

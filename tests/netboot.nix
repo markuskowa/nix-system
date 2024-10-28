@@ -2,6 +2,8 @@
 
 let
   handleTest = test: (import "${pkgs.path}/nixos/tests/make-test-python.nix") test {};
+
+  # Boot server IP
   ipServer = "192.168.1.1";
 
   makeTest = type: client: handleTest ({
@@ -10,36 +12,10 @@ let
     nodes = {
       inherit client;
 
-      bootServer = { pkgs, modulesPath, nodes, ... } : let
+      bootServer = { pkgs, modulesPath, config, nodes, ... } :
+      {
+        imports = [ ../modules/kea.nix ];
 
-        configuration = {
-          imports = [
-            (modulesPath + "/installer/netboot/netboot-minimal.nix")
-            (modulesPath + "/testing/test-instrumentation.nix")
-          ];
-        };
-
-        sys = import "${pkgs.path}/nixos" {
-          inherit configuration;
-        };
-
-        # Provision images
-        setup-boot = pkgs.writeScriptBin "setup-boot" ''
-          cp ${pkgs.ipxe}/ipxe.efi /srv
-          cp ${pkgs.ipxe}/undionly.kpxe /srv
-          cp ${sys.config.system.build.netbootRamdisk}/initrd /srv
-          cp ${sys.config.system.build.kernel}/bzImage /srv
-
-          cat > /srv/netboot.ipxe << EOF
-          #!ipxe
-          dhcp net1
-          initrd http://${ipServer}/initrd
-          kernel http://${ipServer}/bzImage init=${sys.config.system.build.toplevel}/init ${toString sys.config.boot.kernelParams}
-          boot
-          EOF
-        '';
-
-      in {
         virtualisation.memorySize = 2048;
 
         networking.firewall = {
@@ -48,94 +24,42 @@ let
         };
 
         services.atftpd = {
-          enable = true;
+          enable = (lib.substring 0 3 type) == "pxe";
           root = "/srv";
         };
 
         services.httpd = {
           enable = true;
           virtualHosts.boot = {
-            documentRoot = "/srv";
+            documentRoot = config.services.atftpd.root;
           };
         };
 
-        environment.systemPackages = [ setup-boot ];
+        services.kea-simple = {
+          enable = true;
 
-        services.kea = {
-          ctrl-agent = {
-            enable = true;
-            settings = {
-              http-port = 8000;
-              http-host = "127.0.0.1";
+          interfaces = [ "eth1" ];
 
-              control-sockets = {
-                 dhcp4 = {
-                   socket-type = "unix";
-                   socket-name = "/run/kea/socket-dhcp-v4";
-                 };
-              };
-            };
+          subnets.eth1 = {
+            id = 1;
+            subnet = "192.168.1.0/24";
+            pools = [ "192.168.1.10 - 192.168.1.20" ];
           };
-          dhcp4 = {
+
+          netboot = {
             enable = true;
-            settings = {
-              control-socket = {
-                 socket-type = "unix";
-                 socket-name = "/run/kea/socket-dhcp-v4";
-              };
+            server = ipServer;
 
-              loggers = [{
-                name = "kea-dhcp4";
-                output_options = [ { output = "syslog"; }];
-                severity = "INFO"; # Set to DEBUG for debugging classes
-                debuglevel = 55;
-              }];
+            pxeBios = (type == "pxe-bios");
+            pxeUefi = (type == "pxe-uefi");
+            httpUefi = (type == "uri-uefi") || (type == "http-uefi");
+            ipxe.srvDirectory = config.services.atftpd.root;
 
-              valid-lifetime = 3600;
-
-              lease-database = {
-                name = "/var/lib/kea/dhcp4.leases";
-                persist = true;
-                type = "memfile";
-              };
-
-              client-classes = [
-                { # Serve iPXE script (77 = user class)
-                  name = "ipxe";
-                  test = "substring(option[77].hex,0,4) == 'iPXE'";
-                  boot-file-name = "http://${ipServer}/netboot.ipxe";
-                } ]
-                ++ lib.optional (type == "http-uefi")
-                { # Serve via HTTP (60 = "vendor-class-identifier)
-                  name = "http-uefi";
-                  test = "substring(option[60].hex, 0, 10 ) == 'HTTPClient' and not member('ipxe')";
-                  option-data = [ { name = "vendor-class-identifier"; data = "HTTPClient"; } ];
-                  boot-file-name = "http://${ipServer}/ipxe.efi";
-                }
-                ++ lib.optional (type == "pxe-uefi")
-                {
-                  name = "pxe-uefi";
-                  test = "substring(option[60].hex, 0, 9 ) == 'PXEClient' and option[client-system].hex == 0x0007 and not member('ipxe')";
-                  next-server = ipServer;
-                  boot-file-name = "ipxe.efi";
-                }
-                ++ lib.optional (type == "pxe-bios")
-                {
-                  name = "pxe-bios";
-                  test = "substring(option[60].hex, 0, 9 ) == 'PXEClient' and option[client-system].hex == 0x0000 and not member('ipxe')";
-                  next-server = ipServer;
-                  boot-file-name = "undionly.kpxe";
-                }
-                ;
-
-              interfaces-config.interfaces = [ "eth1" ];
-
-              subnet4 = [ {
-                id = 1;
-                subnet = "192.168.1.0/24";
-                interface = "eth1";
-                pools = [{ pool = "192.168.1.10 - 192.168.1.20"; }];
-              }];
+            netbootImage.config = { modulesPath, ... }: {
+              imports = [
+                (modulesPath + "/installer/netboot/netboot-minimal.nix")
+                (modulesPath + "/testing/test-instrumentation.nix")
+              ];
             };
           };
         };
@@ -143,10 +67,7 @@ let
     };
 
     testScript = ''
-      bootServer.wait_for_unit("multi-user.target")
-
-      # Deploy images
-      bootServer.succeed("setup-boot")
+      bootServer.wait_for_unit("netboot-deploy.service")
 
       client.wait_for_unit("multi-user.target")
       client.succeed("cat /etc/os-release  | grep NixOS")
