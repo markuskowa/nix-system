@@ -26,12 +26,6 @@ in {
             hostname = "client-new";
           }];
         };
-
-        netboot = {
-          enable = true;
-          httpUefi = true;
-          server = "192.168.1.2";
-        };
       };
     };
 
