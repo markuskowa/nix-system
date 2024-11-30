@@ -29,7 +29,7 @@ let
           Lease_Lifetime = 3;
 
           # Limit to nfs4.1; nfs4.2 is broken (returns only empty files!).
-          Minor_Versions = "0, 1";
+          Minor_Versions = "0, 1, 2";
         };
       };
       exports = [
