@@ -47,6 +47,7 @@ in rec {
     hostapd-radius = handleTest ./tests/hostapd-radius.nix {};
     vxlan = handleTest ./tests/vxlan.nix {};
     netboot = import ./tests/netboot.nix { inherit lib pkgs; };
+    zenoh = handleTest ./tests/zenoh.nix {};
     # slurm = handleTest ./tests/slurm.nix {};
   };
 
