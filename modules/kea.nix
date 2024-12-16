@@ -345,7 +345,7 @@ in {
         wantedBy = [ "kea-dhcp4-server.service" ];
 
         serviceConfig = {
-          type = "oneshot";
+          Type = "oneshot";
           ExecStart = "${deployScript} ${cfg.netboot.ipxe.srvDirectory}";
         };
       };

@@ -70,7 +70,7 @@ in
       environment = cfg.env;
 
       serviceConfig = {
-        type = "simple";
+        Type = "simple";
         ExecStart = "${lib.getExe cfg.package} -c ${cfgFile} "
           + (lib.concatStringsSep " " cfg.extraOptions);
       };
