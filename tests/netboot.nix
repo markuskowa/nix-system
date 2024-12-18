@@ -67,7 +67,8 @@ let
     };
 
     testScript = ''
-      bootServer.wait_for_unit("netboot-deploy.service")
+      bootServer.wait_for_unit("kea-dhcp4-server.service")
+      bootServer.wait_for_file("/srv/netboot.ipxe")
 
       client.wait_for_unit("multi-user.target")
       client.succeed("cat /etc/os-release  | grep NixOS")
