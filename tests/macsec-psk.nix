@@ -39,7 +39,7 @@ in {
   testScript = ''
     start_all()
     for node in machines:
-      node.wait_for_unit("network-online.target")
+      node.wait_for_unit("multi-user.target")
 
     for node in machines:
       node.wait_until_succeeds("wpa_cli status | grep Secured=Yes")
