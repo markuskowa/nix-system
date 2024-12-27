@@ -13,7 +13,7 @@
         7447
       ];
 
-      services.zenoh = {
+      services.zenohd = {
         enable = true;
 
         plugins = with pkgs; [
