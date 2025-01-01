@@ -27,7 +27,6 @@ in {
   tmpsRoot = importModule ./tmpfsroot.nix;
   vxlan = importModule ./vxlan.nix;
   zfs-attrs = importModule ./zfs-attrs.nix;
-  zenoh = importModule ./zeno.nix;
 }
 
 
