@@ -6,7 +6,14 @@ let
   handleTest = t: (import "${nixpkgs}/nixos/tests/make-test-python.nix") (import t);
   pkgs = (import nixpkgs) {
     overlays = [ (import ./default.nix) ];
-    config.allowUnfree = true;
+    config = {
+      allowUnfree = true;
+
+      # Allow temporarily until CVEs are fixed
+      permittedInsecurePackages = [
+        "redmine-5.1.5"
+      ];
+    };
   };
 
   inherit (pkgs) lib;
