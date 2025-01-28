@@ -22,7 +22,6 @@
     ./tmpfsroot.nix
     ./vxlan.nix
     ./zfs-attrs.nix
-    ./zenoh.nix
   ];
 
   nixpkgs.overlays = [ (import ../default.nix) ];

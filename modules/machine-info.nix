@@ -62,5 +62,4 @@ in
       ${optionalString (cfg.hardwareModel != null) "HARDWARE_MODEL=${cfg.hardwareModel}"}
     '';
   };
-
 }

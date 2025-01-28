@@ -8,11 +8,6 @@ let
     overlays = [ (import ./default.nix) ];
     config = {
       allowUnfree = true;
-
-      # Allow temporarily until CVEs are fixed
-      permittedInsecurePackages = [
-        "redmine-5.1.5"
-      ];
     };
   };
 
@@ -62,7 +57,7 @@ in rec {
       borgbackup
       influxdb
       moosefs
-      redmine
+      # redmine
       slurm
       telegraf;
       grafana = pkgs.nixosTests.grafana.basic;
@@ -81,8 +76,9 @@ in rec {
       "upstreamTests.influxdb"
       "upstreamTests.grafana"
       "upstreamTests.moosefs"
-      "upstreamTests.redmine.mysql"
-      "upstreamTests.redmine.pgsql"
+      # disable until CVEs are resolved
+      # "upstreamTests.redmine.mysql"
+      # "upstreamTests.redmine.pgsql"
       "upstreamTests.slurm"
       "upstreamTests.telegraf"
     ];
