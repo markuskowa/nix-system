@@ -343,6 +343,7 @@ in {
         '';
       in mkIf cfg.netboot.enable {
         wantedBy = [ "kea-dhcp4-server.service" ];
+        before = [ "kea-dhcp4-server.service" ];
 
         serviceConfig = {
           Type = "oneshot";

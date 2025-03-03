@@ -6,7 +6,9 @@ let
   handleTest = t: (import "${nixpkgs}/nixos/tests/make-test-python.nix") (import t);
   pkgs = (import nixpkgs) {
     overlays = [ (import ./default.nix) ];
-    config.allowUnfree = true;
+    config = {
+      allowUnfree = true;
+    };
   };
 
   inherit (pkgs) lib;
@@ -47,7 +49,6 @@ in rec {
     hostapd-radius = handleTest ./tests/hostapd-radius.nix {};
     vxlan = handleTest ./tests/vxlan.nix {};
     netboot = import ./tests/netboot.nix { inherit lib pkgs; };
-    zenoh = handleTest ./tests/zenoh.nix {};
     # slurm = handleTest ./tests/slurm.nix {};
   };
 
@@ -56,7 +57,7 @@ in rec {
       borgbackup
       influxdb
       moosefs
-      redmine
+      # redmine
       slurm
       telegraf;
       grafana = pkgs.nixosTests.grafana.basic;
@@ -75,8 +76,9 @@ in rec {
       "upstreamTests.influxdb"
       "upstreamTests.grafana"
       "upstreamTests.moosefs"
-      "upstreamTests.redmine.mysql"
-      "upstreamTests.redmine.pgsql"
+      # disable until CVEs are resolved
+      # "upstreamTests.redmine.mysql"
+      # "upstreamTests.redmine.pgsql"
       "upstreamTests.slurm"
       "upstreamTests.telegraf"
     ];

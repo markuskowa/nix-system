@@ -1,5 +1,5 @@
 { lib, stdenv, fetchFromGitHub, which, util-linux
-, autoconf, automake, libtool, makeWrapper
+, autoconf, automake, libtool, makeWrapper, bashInteractive
 , jq, parallel, squashfsTools, libmd, libbsd
 }:
 
@@ -37,6 +37,8 @@ stdenv.mkDerivation rec {
 
   postInstall = ''
     wrapProgram $out/bin/enroot --prefix PATH ":" "${jq}/bin:${parallel}/bin:${squashfsTools}/bin"
+    echo ${makeWrapper.shell}
+    sed -i '1 s:.*:${bashInteractive}/bin/bash:' $out/bin/.enroot-wrapped
   '';
 
   meta = with lib; {
