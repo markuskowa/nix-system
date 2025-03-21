@@ -40,6 +40,7 @@ in rec {
     isns = handleTest ./tests/isns.nix {};
     kea = handleTest ./tests/kea.nix {};
     networkmap = handleTest ./tests/networkmap.nix {};
+    netinfra = handleTest ./tests/netinfra.nix {};
     machine-info = handleTest ./tests/machine-info.nix {};
     geoblocking = handleTest ./tests/geoblocking.nix {};
     sshCA = handleTest ./tests/sshCA.nix {};

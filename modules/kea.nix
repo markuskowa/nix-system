@@ -2,10 +2,17 @@
 
 let
   inherit (lib)
+    concatStrings
+    filter
+    fromHexString
+    toHexString
+    toInt
+    splitString
     mkIf
     mkOption
     mkDefault
     mkEnableOption
+    mapAttrs
     mapAttrsToList
     types
   ;
@@ -16,19 +23,41 @@ let
     configuration = cfg.netboot.netbootImage.config;
   }).config;
 
+  libsys = import ../lib.nix { inherit pkgs lib; };
+
 in {
   options.services.kea-simple = {
     enable = mkEnableOption "kea simple setup";
 
+    useInfra = mkEnableOption "subnet generation from infrastructure data";
+
     interfaces = mkOption {
-      description = "List of interfaces to serve.";
+      description = "List of interfaces to serve";
       type = with types; listOf str;
     };
 
     valid-lifetime = mkOption {
-      description = "DHCP lease lifetime.";
+      description = "DHCP lease lifetime";
       type = types.ints.u32;
       default = 3600;
+    };
+
+    renew-timer = mkOption {
+      description = "Indicate release renewal time";
+      type = types.ints.u32;
+      default = 1800;
+    };
+
+    rebind-timer = mkOption {
+      description = "Lease rebind";
+      type = types.ints.u32;
+      default = 3200;
+    };
+
+    loglevel = mkOption {
+      description = "Loglevel";
+      type = with types; enum [ "INFO" "WARN" "ERROR" ];
+      default = "WARN";
     };
 
     subnets = mkOption {
@@ -42,18 +71,18 @@ in {
 
           id = mkOption {
             description = "Subnet ID for kea.";
-            type = types.ints.u16;
+            type = types.ints.u32;
           };
 
           dns = mkOption {
             description = "List of DNS servers";
-            type = with types; listOf (strMatching "^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$");
+            type = with types; listOf (strMatching "^([0-9]{1,3}\.){3}[0-9]{1,3}$");
             default = [];
           };
 
           router = mkOption {
             description = "Router for subnet";
-            type = with types; nullOr (strMatching "^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$");
+            type = with types; nullOr (strMatching "^([0-9]{1,3}\.){3}[0-9]{1,3}$");
             default = null;
           };
 
@@ -209,9 +238,9 @@ in {
              socket-name = "/run/kea/socket-dhcp-v4";
           };
 
-          loggers = [{
+          loggers = mkDefault [{
             name = "kea-dhcp4";
-            severity = "WARN";
+            severity = mkDefault cfg.loglevel;
           }];
 
           lease-database = mkDefault {
@@ -221,6 +250,8 @@ in {
           };
 
           valid-lifetime = mkDefault cfg.valid-lifetime;
+          renew-timer = mkDefault cfg.renew-timer;
+          rebind-timer = mkDefault cfg.rebind-timer;
 
           interfaces-config.interfaces = cfg.interfaces;
 
@@ -265,7 +296,7 @@ in {
               ) subnet.reservations;
 
               option-data = [ { name = "interface-mtu"; data = toString subnet.mtu; } ]
-                ++ lib.optional (subnet.router != null) { name = "routers"; data = subnet.routers; }
+                ++ lib.optional (subnet.router != null) { name = "routers"; data = subnet.router; }
                 ++ lib.optional (lib.length subnet.dns > 0) {
                   name = "domain-name-servers";
                   data = lib.concatStringsSep "," subnet.dns;
@@ -275,8 +306,10 @@ in {
       };
     };
 
-    # Create scripts
-    services.kea-simple.netboot.ipxe.script = mkIf cfg.netboot.ipxe.enable ''
+    services.kea-simple = {
+
+      # Create scripts
+      netboot.ipxe.script = mkIf cfg.netboot.ipxe.enable ''
       #!ipxe
 
       :menu
@@ -323,6 +356,36 @@ in {
       goto menu
     '';
 
+      # Generate DHCP settings from infra
+      subnets =
+        mkIf cfg.useInfra
+        (mapAttrs (name: net: {
+          # IP prefix to integer
+          id = fromHexString (concatStrings (map (x: toHexString (toInt x)) (splitString "." net.subnet)));
+          subnet = "${net.subnet}/${toString net.prefixLength}";
+          mtu = net.mtu;
+          dns = net.dns;
+          router = libsys.genAddress net.subnet net.gateway;
+
+          pools = map (pool:
+              "${libsys.genAddress net.subnet pool.begin}-${libsys.genAddress net.subnet pool.end}"
+            ) net.pools;
+
+          reservations =
+            lib.pipe net.hosts [
+              lib.attrsToList
+              (filter (x: x.value.mac != null))
+              (map (host: {
+                hw-address = host.value.mac;
+                ip-address = libsys.genAddress net.subnet host.value.hostIndex;
+                hostname = if host.value.dns != null then host.value.dns else "${host.name}.${name}";
+              }))
+            ];
+      }) (lib.filterAttrs(_: x: x.dhcpManaged) config.infra.networks));
+
+    };
+
+    # Netboot deploy service
     systemd.services.netboot-deploy = let
         ipxeScript = pkgs.writeText "netboot.ipxe" cfg.netboot.ipxe.script;
         deployScript = pkgs.writeShellScript "deploy-netboot" ''
