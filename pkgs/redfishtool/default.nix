@@ -13,6 +13,9 @@ python3Packages.buildPythonApplication rec {
 
   propagatedBuildInputs = [ python3Packages.requests ];
 
+  pyproject = true;
+  build-system = [ python3Packages.setuptools ];
+
   meta = with lib; {
     description = "RESTful API for Data Center Hardware Management";
     maintainers = [ maintainers.markuskowa ];
