@@ -103,17 +103,17 @@ in {
   testScript = ''
     server.wait_for_unit("kea-dhcp4-server.service")
     # Check MAC addresses
-    node1.succeed("ifconfig eth1 | grep aa:22:33:44:af:66")
-    node1.succeed("ifconfig eth2 | grep aa:22:33:44:af:68")
+    node1.succeed("ip link show eth1 | grep aa:22:33:44:af:66")
+    node1.succeed("ip link show eth2 | grep aa:22:33:44:af:68")
 
-    node2.succeed("ifconfig eth1 | grep aa:22:33:44:af:67")
-    node2.succeed("ifconfig eth2 | grep aa:22:33:44:af:69")
+    node2.succeed("ip link show eth1 | grep aa:22:33:44:af:67")
+    node2.succeed("ip link show eth2 | grep aa:22:33:44:af:69")
 
-    node1.wait_until_succeeds("ifconfig eth1 | grep 192.168.10.1")
-    node1.wait_until_succeeds("ifconfig eth2 | grep 192.168.11.1")
+    node1.wait_until_succeeds("ip a show eth1 | grep 192.168.10.1")
+    node1.wait_until_succeeds("ip a show eth2 | grep 192.168.11.1")
 
-    node2.wait_until_succeeds("ifconfig eth1 | grep 192.168.10.2")
-    node2.wait_until_succeeds("ifconfig eth2 | grep 192.168.11.2")
+    node2.wait_until_succeeds("ip a show eth1 | grep 192.168.10.2")
+    node2.wait_until_succeeds("ip a show eth2 | grep 192.168.11.2")
 
     node1.wait_until_succeeds("ping -c 1 n-node2")
     node1.wait_until_succeeds("ping -c 1 d-node2")
