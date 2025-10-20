@@ -17,13 +17,14 @@ let
   #  callTest = t: pkgs.lib.hydraJob t.test;
   #};
 
-in rec {
+in {
   # Evaluate overlay packages
   inherit (pkgs)
     enroot
     nhc
     target-isns
     ipdeny-zones
+    slurm-spank-x11
     slurm-spank-stunnel
     slurm-spank-pyxis
     redfishtool;
@@ -59,7 +60,7 @@ in rec {
       borgbackup
       influxdb
       moosefs
-      # redmine
+      redmine
       slurm
       telegraf;
       grafana = pkgs.nixosTests.grafana.basic;
