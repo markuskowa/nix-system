@@ -52,6 +52,7 @@ in {
     vxlan = handleTest ./tests/vxlan.nix {};
     netboot = import ./tests/netboot.nix { inherit lib pkgs; };
     nfs-tls = handleTest ./tests/nfs-tls.nix { inherit lib pkgs; };
+    nfs-ref = handleTest ./tests/nfs-ref.nix { inherit lib pkgs; };
     # slurm = handleTest ./tests/slurm.nix {};
   };
 
