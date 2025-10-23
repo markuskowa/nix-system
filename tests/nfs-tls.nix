@@ -42,7 +42,7 @@
         -----END CERTIFICATE-----
       '';
 
-      key = pkgs.writeText "serverCert.pem" ''
+      key = pkgs.writeText "serverKey.pem" ''
         -----BEGIN PRIVATE KEY-----
         MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAL3GD3A6hDc+QcsQ
         DFJngkt6pLDTJhHIZL5N4bDmGSSnKItbI5EDlVrUcRCIxtD/sH0UAbAI08W+U883
@@ -107,7 +107,7 @@
         -----END CERTIFICATE-----
       '';
 
-      key = pkgs.writeText "clientCert.pem" ''
+      key = pkgs.writeText "clientKey.pem" ''
         -----BEGIN PRIVATE KEY-----
         MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAPXEeTuE16EEGylX
         0Vp7/51El2FOk0L5emlKRDgH+vvgZrkR+QJwBSw5OAWNkZNGZbNb4TO4WZdkPC6g
