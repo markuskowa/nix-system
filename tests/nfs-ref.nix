@@ -51,9 +51,9 @@ in {
         };
       };
 
-      environment.etc."request-key.conf".text = lib.mkForce ''
+      # Not in upstream yet
+      environment.etc."request-key.d/dns_resolver.conf".text = ''
         create dns_resolver  * * ${pkgs.keyutils}/bin/key.dns_resolver %k
-        create id_resolver   * * ${pkgs.nfs-utils}/bin/nfsidmap -t 600 %k %d
       '';
 
       networking.firewall.enable = false;
@@ -84,4 +84,3 @@ in {
       server2.wait_for_file("/data/exports");
   '';
 }
-
