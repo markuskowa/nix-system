@@ -37,7 +37,7 @@ in {
 
   config = mkIf cfg.enable {
 
-    environment.systemPackages = [ pkgs.targetcli ]
+    environment.systemPackages = [ pkgs.targetcli-fb ]
       ++ optional cfg.isns.enable pkgs.target-isns;
 
     systemd.tmpfiles.rules = [
@@ -55,8 +55,8 @@ in {
 
         serviceConfig = {
           Type = "oneshot";
-          ExecStart = "${pkgs.python3Packages.rtslib}/bin/targetctl restore ${optionalString (cfg.config != null) "${pkgs.writeText "targetcli.json" (toJSON cfg.config)}"}";
-          ExecStop = "${pkgs.python3Packages.rtslib}/bin/targetctl clear";
+          ExecStart = "${pkgs.python3Packages.rtslib-fb}/bin/targetctl restore ${optionalString (cfg.config != null) "${pkgs.writeText "targetcli.json" (toJSON cfg.config)}"}";
+          ExecStop = "${pkgs.python3Packages.rtslib-fb}/bin/targetctl clear";
           RemainAfterExit=true;
         };
       };
@@ -69,7 +69,7 @@ in {
 
         serviceConfig = {
           Type = "simple";
-          ExecStart = "${pkgs.targetcli}/bin/targetclid";
+          ExecStart = "${pkgs.targetcli-fb}/bin/targetclid";
           Restart = "on-failure";
         };
       };
