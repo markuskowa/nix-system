@@ -2,13 +2,13 @@
 
 stdenvNoCC.mkDerivation rec {
   pname = "ipdeny";
-  version = "20241219";
+  version = "20260130";
 
   src = fetchFromGitHub {
     owner = "markuskowa";
     repo = "ipdeny-zones";
     rev = version;
-    hash = "sha256-E2qEvCyg8do+HEbX7ERchdEK6U7M2jrvXfOvSSw/lgw=";
+    hash = "sha256-xtrY6hMPYsgxq4LKExUcCfO4HuIGz50krVi+VWz9D00=";
   };
 
   installPhase = ''
