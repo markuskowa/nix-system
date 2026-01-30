@@ -30,7 +30,7 @@
         eth1.ipv4.addresses = lib.mkOverride 0 [ { address = "10.10.0.1"; prefixLength = 24; } ];
 
         # This is in the US zone
-        eth2.ipv4.addresses = lib.mkOverride 0 [ { address = "4.0.0.1"; prefixLength = 24; } ];
+        eth2.ipv4.addresses = lib.mkOverride 0 [ { address = "2.56.8.1"; prefixLength = 24; } ];
 
         # This is in the SY zone
         eth3.ipv4.addresses = lib.mkOverride 0 [ { address = "5.0.0.1"; prefixLength = 24; } ];
@@ -48,11 +48,11 @@
       virtualisation.vlans = [ 2 ];
       imports = [ ../modules/overlay.nix ];
       networking.interfaces = {
-        eth1.ipv4.addresses = lib.mkOverride 0 [ { address = "4.0.0.2"; prefixLength = 24; } ];
+        eth1.ipv4.addresses = lib.mkOverride 0 [ { address = "2.56.8.2"; prefixLength = 24; } ];
       };
 
       networking.defaultGateway = {
-        address = "4.0.0.1";
+        address = "2.56.8.1";
         interface = "eth1";
       };
 
