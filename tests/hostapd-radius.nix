@@ -61,9 +61,10 @@
       imports = [ ../modules/overlay.nix ];
       virtualisation.vlans = [ 1 2 ];
 
+      systemd.tmpfiles.rules = [ "d /run/wpa_supplicant/client 1770 root root -" ];
       systemd.services.wpa = let
         wpaConf = pkgs.writeText "wpa.conf" ''
-          ctrl_interface=/run/wpa_supplicant
+          ctrl_interface=/run/wpa_supplicant/client
           ap_scan=0
           eapol_version=2
           network={
@@ -98,7 +99,7 @@
     client.wait_for_unit("wpa.service")
 
     apd.wait_until_succeeds("${pkgs.hostapd}/bin/hostapd_cli all_sta  | grep AUTHORIZED")
-    client.wait_until_succeeds("${pkgs.wpa_supplicant}/bin/wpa_cli status | grep 'EAP state=SUCCESS'")
+    client.wait_until_succeeds("${pkgs.wpa_supplicant}/bin/wpa_cli -p /run/wpa_supplicant/client status | grep 'EAP state=SUCCESS'")
   '';
 
 }

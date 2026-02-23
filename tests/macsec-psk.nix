@@ -42,7 +42,7 @@ in {
       node.wait_for_unit("multi-user.target")
 
     for node in machines:
-      node.wait_until_succeeds("wpa_cli status | grep Secured=Yes")
+      node.wait_until_succeeds("wpa_cli -p/run/wpa_supplicant/client status | grep Secured=Yes")
 
     for i in [ 2, 3 ]:
       node.succeed("ping -c3 node{}".format(i))

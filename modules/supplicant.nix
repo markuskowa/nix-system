@@ -22,7 +22,7 @@ let
 
 
   cfgFile = iface: x: pkgs.writeText "wpa_supplicant.conf" ''
-    ctrl_interface=/run/wpa_supplicant
+    ctrl_interface=/run/wpa_supplicant/client
     ap_scan=0
     eapol_version=${toString x.eapol_version}
     ${concatStringsSep "\n" (map (net: ''
