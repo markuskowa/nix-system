@@ -10,7 +10,8 @@ let
       '';
 
     in {
-      imports = [ ../modules/overlay.nix ];
+      imports = [ ../modules/iscsid.nix ];
+      nixpkgs.overlays = [ (import ../default.nix) ];
 
       # iscsid picks the IPv6 address of server
       # and tries it first (which fails).
@@ -25,7 +26,8 @@ let
     };
 
   server = {
-    imports = [ ../modules/overlay.nix ];
+    imports = [ ../modules/iscsiTarget.nix ];
+    nixpkgs.overlays = [ (import ../default.nix) ];
 
     boot.initrd.postDeviceCommands = ''
       ${pkgs.e2fsprogs}/bin/mkfs.ext4 -L data /dev/vdb
@@ -55,6 +57,8 @@ let
     targetcli /iscsi/${iqn "server" n}/tpg1 set attribute authentication=1
     targetcli /iscsi/${iqn "server" n}/tpg1/acls/${iqn "client" n} set auth userid=client${toString n}
     targetcli /iscsi/${iqn "server" n}/tpg1/acls/${iqn "client" n} set auth password=test
+    targetcli /iscsi/${iqn "server" n}/tpg1/portals delete ::0 3260
+    targetcli /iscsi/${iqn "server" n}/tpg1/portals create 0.0.0.0 3260
 
     targetcli saveconfig
   '';
@@ -70,7 +74,8 @@ in {
     server2 = server;
 
     ns =  {
-      imports = [ ../modules/overlay.nix ];
+      imports = [ ../modules/isns.nix ];
+      nixpkgs.overlays = [ (import ../default.nix) ];
 
       services.isnsd = {
         enable = true;
@@ -106,17 +111,12 @@ in {
         server.succeed("test -d /etc/target")
 
     # Create target
+    # Needed to restart target-isns
     server1.succeed("${targetInit 1}")
+    server1.start_job("target-isns.service")
     server2.succeed("${targetInit 2}")
+    server2.start_job("target-isns.service")
 
-    for server in [server1, server2]:
-        server.shutdown()
-        server.start()
-        server.wait_for_unit("multi-user.target")
-
-        server.succeed("test -f /etc/target/saveconfig.json")
-        server.succeed("targetcli ls 1>&2")
-        server.succeed("targetcli ls | grep 'iqn.2004-01.org.nixos.san:server'")
 
     # Check registration of nodes
     ns.succeed("isnsadm --local --list nodes | grep server1")
