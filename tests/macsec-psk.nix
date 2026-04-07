@@ -38,10 +38,10 @@ in {
 
   testScript = ''
     start_all()
-    for node in machines:
+    for node in [node1, node2, node3]:
       node.wait_for_unit("multi-user.target")
 
-    for node in machines:
+    for node in [node1, node2, node3]:
       node.wait_until_succeeds("wpa_cli -p/run/wpa_supplicant/client status | grep Secured=Yes")
 
     for i in [ 2, 3 ]:
