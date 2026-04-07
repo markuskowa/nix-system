@@ -15,6 +15,7 @@ let
   };
 
 in {
+  imports = [ ./iscsiBoot.nix ];
   ###### interface
 
   options = {
@@ -118,7 +119,7 @@ in {
         wantedBy = [ "remote-fs.target" ];
         before = [ "remote-fs.target" ];
         after = [ "network.target" "network-online.target" "iscsid.service" ];
-        requires = [ "iscsid.service" ];
+        requires = [ "iscsid.service" "network-online.target" ];
 
         preStart = ''
           ${concatStringsSep "\n" (

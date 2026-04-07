@@ -10,6 +10,10 @@ let
     falseVal = "0";
   };
 
+  initiatorName = pkgs.writeText "initiatorname.iscsi" ''
+    InitiatorName=${cfg.initiatorName}
+  '';
+
 in {
   ###### interface
 
@@ -26,7 +30,7 @@ in {
               type = types.str;
               description = "Initiator name.";
               example = "iqn.2004-01.org.nixos.san:initiator";
-              default = "iqn.2004-01.org.nixos.san:${config.networking.hostName}";
+              default = "iqn.2004-01.org.nixos.san:${config.networking.hostName}.isns";
             };
 
             DefaultDiscoveryDomain = mkOption {
@@ -78,7 +82,9 @@ in {
     environment.systemPackages = [ pkgs.open-isns ];
 
     environment.etc."isns/isnsadm.conf" = {
-      text = "";
+      text = ''
+        SourceName=${cfg.settings.SourceName}
+      '';
     };
 
     systemd.services = let

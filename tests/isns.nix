@@ -10,7 +10,8 @@ let
       '';
 
     in {
-      imports = [ ../modules/overlay.nix ];
+      imports = [ ../modules/iscsid.nix ];
+      nixpkgs.overlays = [ (import ../default.nix) ];
 
       # iscsid picks the IPv6 address of server
       # and tries it first (which fails).
@@ -25,7 +26,8 @@ let
     };
 
   server = {
-    imports = [ ../modules/overlay.nix ];
+    imports = [ ../modules/iscsiTarget.nix ];
+    nixpkgs.overlays = [ (import ../default.nix) ];
 
     boot.initrd.postDeviceCommands = ''
       ${pkgs.e2fsprogs}/bin/mkfs.ext4 -L data /dev/vdb
@@ -70,7 +72,8 @@ in {
     server2 = server;
 
     ns =  {
-      imports = [ ../modules/overlay.nix ];
+      imports = [ ../modules/isns.nix ];
+      nixpkgs.overlays = [ (import ../default.nix) ];
 
       services.isnsd = {
         enable = true;
@@ -119,8 +122,8 @@ in {
         server.succeed("targetcli ls | grep 'iqn.2004-01.org.nixos.san:server'")
 
     # Check registration of nodes
-    ns.succeed("isnsadm --local --list nodes | grep server1")
-    ns.succeed("isnsadm --local --list nodes | grep server2")
+    ns.wait_until_succeeds("isnsadm --local --list nodes | grep server1")
+    ns.wait_until_succeeds("isnsadm --local --list nodes | grep server2")
 
 
     for client in [client1, client2]:
