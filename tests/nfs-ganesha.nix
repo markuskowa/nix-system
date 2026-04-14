@@ -4,26 +4,24 @@ let
   server = { pkgs, ... } : {
     imports = [ ../modules/overlay.nix ];
     networking.firewall.allowedTCPPorts = [ 2049 ];
-    boot.initrd.postDeviceCommands = ''
-      ${pkgs.e2fsprogs}/bin/mkfs.ext4 -L data /dev/vdb
-      ${pkgs.xfsprogs}/bin/mkfs.xfs -L data_xfs /dev/vdc
-      ${pkgs.btrfs-progs}/bin/mkfs.btrfs -L data_btrfs /dev/vdd
-    '';
 
     virtualisation.emptyDiskImages = [ 1024 1024 1024 ];
 
     fileSystems = pkgs.lib.mkVMOverride {
       "/data_vfs" = {
-        device = "/dev/disk/by-label/data";
+        device = "/dev/vdb";
         fsType = "ext4";
+        autoFormat = true;
       };
       "/data_xfs" = {
-        device = "/dev/disk/by-label/data_xfs";
+        device = "/dev/vdc";
         fsType = "xfs";
+        autoFormat = true;
       };
       "/data_btrfs" = {
-        device = "/dev/disk/by-label/data_btrfs";
+        device = "/dev/vdd";
         fsType = "btrfs";
+        autoFormat = true;
       };
     };
 
