@@ -38,8 +38,8 @@
       server.succeed("ssh-keygen -t rsa -N \"\" -f {}/ca_host_key -I CA".format(shared_dir))
 
       # Sign host keys
-      server.succeed("ssh-keygen -s {}/ca_host_key -h -I server /etc/ssh/ssh_host_ed25519_key.pub".format(shared_dir))
-      server.succeed("ssh-keygen -s {}/ca_host_key -h -I server /etc/ssh/ssh_host_rsa_key.pub".format(shared_dir))
+      server.succeed("ssh-keygen -s {}/ca_host_key -h -n server -I server /etc/ssh/ssh_host_ed25519_key.pub".format(shared_dir))
+      server.succeed("ssh-keygen -s {}/ca_host_key -h -n server -I server /etc/ssh/ssh_host_rsa_key.pub".format(shared_dir))
       server.succeed("systemctl restart sshd")
 
       # Generate client key
