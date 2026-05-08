@@ -44,7 +44,10 @@ in {
       "d /etc/target - - - - -"
     ];
 
-    boot.kernelModules = [ "configfs" ];
+    boot.kernelModules = [
+      "configfs"
+      "iscsi_target_mod"
+    ];
 
     systemd.services = {
       iscsiTarget = {
@@ -75,8 +78,8 @@ in {
       };
 
       target-isns = mkIf cfg.isns.enable {
-        after = [ "network.target" "network-online.target" "iscsiTarget.service" ];
-        wantedBy = [ "remote-fs.target" ];
+        after = [ "network.target" "network-online.target" "iscsiTarget.service" "targetclid.service" ];
+        wantedBy = [ "multi-user.target" ];
         requires = [ "targetclid.service" "iscsiTarget.service" ];
         bindsTo = [ "targetclid.service" "iscsiTarget.service" ];
 
