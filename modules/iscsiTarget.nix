@@ -80,7 +80,7 @@ in {
       target-isns = mkIf cfg.isns.enable {
         after = [ "network.target" "network-online.target" "iscsiTarget.service" "targetclid.service" ];
         wantedBy = [ "multi-user.target" ];
-        requires = [ "targetclid.service" "iscsiTarget.service" ];
+        requires = [ "targetclid.service" "iscsiTarget.service" "network-online.target" ];
         bindsTo = [ "targetclid.service" "iscsiTarget.service" ];
 
         serviceConfig = {
