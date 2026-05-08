@@ -2,7 +2,10 @@
 
 let
   iqnPfx = "iqn.2004-01.org.nixos.san";
+  iscsiPort = 3260;
+
   targetInit = pkgs.writeShellScript "targetInit" ''
+    ${pkgs.e2fsprogs}/bin/mkfs.ext4 -L data /dev/vdb
     targetcli /backstores/block create vol /dev/vdb
     targetcli /iscsi create ${iqnPfx}:server
 
@@ -11,6 +14,8 @@ let
     targetcli /iscsi/${iqnPfx}:server/tpg1 set attribute authentication=1
     targetcli /iscsi/${iqnPfx}:server/tpg1/acls/${iqnPfx}:client set auth userid=client
     targetcli /iscsi/${iqnPfx}:server/tpg1/acls/${iqnPfx}:client set auth password=test
+    targetcli /iscsi/${iqnPfx}:server/tpg1/portals delete ::0 ${toString iscsiPort}
+    targetcli /iscsi/${iqnPfx}:server/tpg1/portals create 0.0.0.0 ${toString iscsiPort}
 
     targetcli saveconfig
   '';
@@ -45,13 +50,9 @@ in {
     server = {
       imports = [ ../modules/overlay.nix ];
 
-      boot.initrd.postDeviceCommands = ''
-        ${pkgs.e2fsprogs}/bin/mkfs.ext4 -L data /dev/vdb
-      '';
+      virtualisation.emptyDiskImages = [ 2048 ];
 
-      virtualisation.emptyDiskImages = [ 4096 ];
-
-      networking.firewall.allowedTCPPorts = [ 3260 ];
+      networking.firewall.allowedTCPPorts = [ iscsiPort ];
 
       services.iscsiTarget.enable = true;
     };
