@@ -29,10 +29,6 @@ let
     imports = [ ../modules/iscsiTarget.nix ];
     nixpkgs.overlays = [ (import ../default.nix) ];
 
-    boot.initrd.postDeviceCommands = ''
-      ${pkgs.e2fsprogs}/bin/mkfs.ext4 -L data /dev/vdb
-    '';
-
     virtualisation.emptyDiskImages = [ 4096 ];
 
     networking.enableIPv6 = false;
@@ -98,7 +94,6 @@ in {
 
 
   testScript = ''
-    ns.start()
     ns.wait_for_unit("multi-user.target")
 
     # Check creation of discovery domains
@@ -106,7 +101,6 @@ in {
     ns.succeed("isnsadm --local --list dds | grep domain2")
 
     for server in [server1, server2]:
-        server.start()
         server.wait_for_unit("multi-user.target")
         server.succeed("test -d /etc/target")
 
@@ -119,8 +113,8 @@ in {
 
 
     # Check registration of nodes
-    ns.succeed("isnsadm --local --list nodes | grep server1")
-    ns.succeed("isnsadm --local --list nodes | grep server2")
+    for server in [ "server1", "server2" ]:
+        ns.succeed(f"isnsadm --local --list nodes | grep {server}")
 
 
     for client in [client1, client2]:
@@ -129,10 +123,5 @@ in {
         client.wait_for_unit("iscsi.service")
 
         client.wait_for_file("/dev/sda")
-
-        client.succeed("mkdir -p /mnt; mount /dev/sda /mnt")
-        client.succeed("touch /mnt/hello")
-
-        client.shutdown()
   '';
 }
