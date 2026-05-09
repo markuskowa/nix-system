@@ -14,7 +14,6 @@ in {
   hostapd-wired = importModule ./hostapd-wired.nix;
   infiniband = importModule ./infiniband.nix;
   inituser = importModule ./inituser.nix;
-  iscsiBoot = importModule ./iscsiBoot.nix;
   iscsid = importModule ./iscsid.nix;
   iscsiTarget = importModule ./iscsiTarget.nix;
   isns = importModule ./isns.nix;

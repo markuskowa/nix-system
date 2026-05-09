@@ -37,7 +37,6 @@ in {
     nfs-ganesha = handleTest ./tests/nfs-ganesha.nix {};
     banner = handleTest ./tests/banner.nix {};
     iscsi = handleTest ./tests/iscsi.nix {};
-    iscsiBoot = handleTest ./tests/iscsiBoot.nix {};
     isns = handleTest ./tests/isns.nix {};
     kea = handleTest ./tests/kea.nix {};
     networkmap = handleTest ./tests/networkmap.nix {};

@@ -15,7 +15,6 @@ let
   };
 
 in {
-  imports = [ ./iscsiBoot.nix ];
   ###### interface
 
   options = {
@@ -109,7 +108,7 @@ in {
 
         serviceConfig = {
           Type = "notify";
-          ExecStart = "${pkgs.openiscsi}/bin/iscsid -f -i ${if config.boot.initrd.iscsi.ibft then "/sys/firmware/ibft/initiator/initiator-name" else initiatorName}";
+          ExecStart = "${pkgs.openiscsi}/bin/iscsid -f -i ${initiatorName}";
           KillMode = "mixed";
           Restart = "on-failure";
         };
