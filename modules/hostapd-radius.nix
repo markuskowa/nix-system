@@ -64,9 +64,9 @@ in {
         radius_server_auth_port=${toString cfg.auth_port}
         radius_server_acct_port=${toString cfg.acct_port}
 
-        ${optionalString (cfg.ca_cert !=null) "ca_cert=cfg.${cfg.ca_cert}"}
-        ${optionalString (cfg.server_cert !=null) "server_cert=cfg.${cfg.server_cert}"}
-        ${optionalString (cfg.private_key !=null) "server_cert=cfg.${cfg.private_key}"}
+        ${optionalString (cfg.ca_cert !=null) "ca_cert=${cfg.ca_cert}"}
+        ${optionalString (cfg.server_cert !=null) "server_cert=${cfg.server_cert}"}
+        ${optionalString (cfg.private_key !=null) "private_key=${cfg.private_key}"}
       '';
 
     in {
