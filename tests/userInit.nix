@@ -38,7 +38,7 @@
 
 
   testScript = ''
-    import os
+    import subprocess
 
     server.wait_for_unit("sshd")
 
@@ -46,8 +46,8 @@
     server.succeed("stat -c %a /extra/test | grep 750")
     server.succeed("stat -c %U /extra/test | grep test")
 
-    os.system(
-        '${pkgs.openssh}/bin/ssh-keygen -t ed25519 -f key -N ""'
+    subprocess.call(
+        '${pkgs.openssh}/bin/ssh-keygen -t ed25519 -f key -N ""', shell=True
     )
 
     # Deploy key

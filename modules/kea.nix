@@ -207,36 +207,11 @@ in {
 
   config = mkIf cfg.enable {
     services.kea = {
-      ctrl-agent = {
-        enable = true;
-        settings = {
-          http-port = mkDefault 8000;
-          http-host = mkDefault "127.0.0.1";
-
-          control-sockets = {
-             dhcp4 = {
-               socket-type = "unix";
-               socket-name = "/run/kea/socket-dhcp-v4";
-             };
-             dhcp6 = {
-               socket-type = "unix";
-               socket-name = "/run/kea/socket-dhcp-v6";
-             };
-             d2 = {
-               socket-type = "unix";
-               socket-name = "/run/kea/socket-d2";
-             };
-          };
-        };
-      };
-
       dhcp4 = {
         enable = true;
         settings = {
-          control-socket = {
-             socket-type = "unix";
-             socket-name = "/run/kea/socket-dhcp-v4";
-          };
+          control-sockets = [
+          ];
 
           loggers = mkDefault [{
             name = "kea-dhcp4";
