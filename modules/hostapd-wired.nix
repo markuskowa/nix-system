@@ -46,10 +46,25 @@ let
           DEV=$IFNAME
         ''}
 
-        $EBTABLES -t nat -A PREROUTING -i $DEV -j DROP
-        $EBTABLES -t nat -A POSTROUTING -o $DEV -j DROP
-        $EBTABLES -t nat -I PREROUTING 1 -s $MAC -j ACCEPT
-        $EBTABLES -t nat -I POSTROUTING 1 -d $MAC -j ACCEPT
+        # Allow EAPOL
+        $EBTABLES  -A INPUT  -i $DEV -p 0x888e -j ACCEPT
+        $EBTABLES  -A OUTPUT -o $DEV -p 0x888e -j ACCEPT
+
+        # Allow MAC on device
+        $EBTABLES  -A INPUT  -i $DEV -s $MAC -j ACCEPT
+        $EBTABLES  -A OUTPUT -o $DEV -d $MAC -j ACCEPT
+        $EBTABLES  -A OUTPUT -o $DEV -d ff:ff:ff:ff:ff:ff -j ACCEPT
+
+        # Allow bridge forward traffic
+        $EBTABLES  -A FORWARD -i $DEV -s $MAC -j ACCEPT
+        $EBTABLES  -A FORWARD -o $DEV -d $MAC -j ACCEPT
+        $EBTABLES  -A FORWARD -o $DEV -d ff:ff:ff:ff:ff:ff -j ACCEPT
+
+        # Drop all other traffic
+        $EBTABLES  -A FORWARD -i $DEV -j DROP
+        $EBTABLES  -A FORWARD -o $DEV -j DROP
+        $EBTABLES  -A INPUT -i $DEV -j DROP
+        $EBTABLES  -A OUTPUT -o $DEV -j DROP
         $IP link set "$DEV" master ${bridge}
 
         echo "CONNECT: $DEV -> ${bridge} via $MAC"
@@ -60,8 +75,25 @@ let
           DEV=$IFNAME
         ''}
 
-        $EBTABLES -t nat -D PREROUTING -s $MAC -j ACCEPT
-        $EBTABLES -t nat -D POSTROUTING -d $MAC -j ACCEPT
+        # Allow EAPOL
+        $EBTABLES  -D INPUT  -i $DEV -p 0x888e -j ACCEPT
+        $EBTABLES  -D OUTPUT -o $DEV -p 0x888e -j ACCEPT
+
+        # Allow MAC on device
+        $EBTABLES  -D INPUT  -i $DEV -s $MAC -j ACCEPT
+        $EBTABLES  -D OUTPUT -o $DEV -d $MAC -j ACCEPT
+        $EBTABLES  -D OUTPUT -o $DEV -d ff:ff:ff:ff:ff:ff -j ACCEPT
+
+        # Allow bridge forward traffic
+        $EBTABLES  -D FORWARD -i $DEV -s $MAC -j ACCEPT
+        $EBTABLES  -D FORWARD -o $DEV -d $MAC -j ACCEPT
+        $EBTABLES  -D FORWARD -o $DEV -d ff:ff:ff:ff:ff:ff -j ACCEPT
+
+        # Drop all other traffic
+        $EBTABLES  -D FORWARD -i $DEV -j DROP
+        $EBTABLES  -D FORWARD -o $DEV -j DROP
+        $EBTABLES  -D INPUT -i $DEV -j DROP
+        $EBTABLES  -D OUTPUT -o $DEV -j DROP
         $IP link set "$DEV" nomaster
         echo "DISCONNECT: $MAC@$DEV"
     fi
@@ -72,13 +104,17 @@ in {
     enable = mkEnableOption "Wired hostapd";
 
     default = {};
-    interfaces = mkOption {
+    portGroups = mkOption {
       type = with types; attrsOf (submodule ( { ... } : {
         options = {
           bridge = mkOption {
             description = "Network bridge";
             type = types.str;
             default = "hostapd";
+          };
+
+          interfaces = mkOption {
+            type = with types; listOf str;
           };
 
           settings = mkOption {
@@ -121,52 +157,80 @@ in {
   };
 
   config = mkIf cfg.enable {
-    systemd.tmpfiles.rules = [ "d /run/hostapd 1770 root root -" ];
-    systemd.services = (lib.mapAttrs' (iface: icfg: lib.nameValuePair "hostapd-${iface}" (
+    systemd.services = (lib.mapAttrs' (igroup: icfg: lib.nameValuePair "hostapd-${igroup}" (
       let
         settings = {
-            ctrl_interface = ctrlSocketPath iface;
+            ctrl_interface = ctrlSocketPath igroup;
             ieee8021x = true;
-            interface = iface;
             driver = "${if icfg.settings.macsec_policy then "macsec_linux" else "wired"}";
             eapol_version = if icfg.settings.macsec_policy then 3 else 2;
           } // icfg.settings;
 
-        configFile = settingsFormat.generate "hostapd-${iface}.conf" settings;
+        configFile = settingsFormat.generate "hostapd-${igroup}.conf" settings;
+        interfaceDevices = map (x: "sys-subsystem-net-devices-${x}.device" ) icfg.interfaces;
       in {
         path = [ pkgs.hostapd ];
         requires = [ "network-online.target" ];
         wantedBy = [ "multi-user.target" ];
-        after = [ "sys-subsystem-net-devices-${iface}.device" ];
-        bindsTo = [ "sys-subsystem-net-devices-${iface}.device" ];
+        after = interfaceDevices;
 
         serviceConfig = {
           RuntimeDirectory="hostapd";
-          ExecStart = "${lib.getBin pkgs.hostapd}/bin/hostapd ${configFile}";
+          ExecStart = "${lib.getBin pkgs.hostapd}/bin/hostapd ${
+            lib.concatStringsSep " " (map (x: "-i ${x}") icfg.interfaces)
+          } ${
+            lib.concatStringsSep " " (lib.genList (_: configFile) (lib.length icfg.interfaces))
+          }";
           Restart = "always";
           RestartSec = "1s";
           Type = "simple";
         };
-      })) cfg.interfaces) //
-      (lib.mapAttrs' (iface: icfg: lib.nameValuePair "hostapd-event-${iface}" (
-      {
-        path = [ pkgs.hostapd ];
-        requires = [ "hostapd-event-${iface}.service" ];
-        after = [ "hostapd-event-${iface}.service" ];
-        bindsTo = [ "hostapd-event-${iface}.service" ];
-        wantedBy = [ "multi-user.target" ];
+      })) cfg.portGroups) // (lib.concatMapAttrs (igroup: icfg:
+        lib.listToAttrs (
+            map (iface: {
+              name = "hostapd-event-${igroup}-${iface}";
+              value = {
+                path = [ pkgs.hostapd ];
+                requires = [ "hostapd-${igroup}.service" ];
+                after = [ "hostapd-${igroup}.service" ];
+                bindsTo = [ "hostapd-${igroup}.service" ];
+                wantedBy = [ "multi-user.target" ];
 
-        serviceConfig = {
-          RuntimeDirectory="hostapd";
-          ExecStart = "${lib.getBin pkgs.hostapd}/bin/hostapd_cli -p ${ctrlSocketPath iface} -i ${iface} -a ${
-            actionScript {
-              inherit (icfg) bridge;
-              macsec = icfg.settings.macsec_policy;
-            }}";
-          Restart = "always";
-          RestartSec = "1s";
-          Type = "simple";
-        };
-      })) cfg.interfaces);
+                serviceConfig = {
+                  RuntimeDirectory="hostapd";
+                  ExecStart = "${lib.getBin pkgs.hostapd}/bin/hostapd_cli -p ${ctrlSocketPath igroup} -i ${iface} -a ${
+                    actionScript {
+                      inherit (icfg) bridge;
+                      macsec = icfg.settings.macsec_policy;
+                    }}";
+                  Restart = "always";
+                  RestartSec = "1s";
+                  Type = "simple";
+                };
+              };
+            }) icfg.interfaces
+        )
+      )  cfg.portGroups);
+
+      # (lib.mapAttrs' (igroup: icfg: lib.nameValuePair "hostapd-event-${igroup}" (
+      # {
+      #   path = [ pkgs.hostapd ];
+      #   requires = [ "hostapd-${igroup}.service" ];
+      #   after = [ "hostapd-${igroup}.service" ];
+      #   bindsTo = [ "hostapd-${igroup}.service" ];
+      #   wantedBy = [ "multi-user.target" ];
+      #
+      #   serviceConfig = {
+      #     RuntimeDirectory="hostapd";
+      #     ExecStart = "${lib.getBin pkgs.hostapd}/bin/hostapd_cli -p ${ctrlSocketPath igroup} -a ${
+      #       actionScript {
+      #         inherit (icfg) bridge;
+      #         macsec = icfg.settings.macsec_policy;
+      #       }}";
+      #     Restart = "always";
+      #     RestartSec = "1s";
+      #     Type = "simple";
+      #   };
+      # })) cfg.interfaces);
   };
 }
