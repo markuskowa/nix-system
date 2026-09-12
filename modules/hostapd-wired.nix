@@ -15,6 +15,7 @@ let
   settingsFormat = pkgs.formats.keyValueCustom {
     trueVal = "1";
     falseVal = "0";
+    separator = "=";
   };
 
   actionScript = {

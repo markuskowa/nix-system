@@ -7,6 +7,7 @@ with lib;
 , trueVal ? "true"
 , falseVal ? "false"
 , allowedTypes ? with types; [ bool int float str ]
+, separator ? " = "
 } :
 
 let
@@ -26,5 +27,5 @@ in {
 
   generate = name: value:
     pkgs.writeText name ( lib.concatStringsSep "\n" (
-      lib.mapAttrsToList (key: val: "${key}=${valueToString val}") value ));
+      lib.mapAttrsToList (key: val: "${key}${separator}${valueToString val}") value ));
 }
