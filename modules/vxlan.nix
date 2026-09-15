@@ -47,6 +47,24 @@ in {
           default = 4789;
         };
 
+        learning = mkOption {
+          description = "Enable MAC learning";
+          type = types.bool;
+          default = true;
+        };
+
+        external = mkOption {
+          description = "Enable external control plane";
+          type = types.bool;
+          default = false;
+        };
+
+        vnifilter = mkOption {
+          description = "Only receive VNIs configured";
+          type = types.bool;
+          default = false;
+        };
+
         dev = mkOption {
           type = with types; nullOr str;
           description = "Physical interface to bind to";
@@ -79,9 +97,14 @@ in {
 
         # Add new interface
         ip link add ${name} type vxlan id ${toString net.id} ${optionalString (net.local != null) "local ${net.local}"} \
-          ${optionalString (net.remote == null && net.group != null) "group ${net.group}"} ${optionalString (net.remote != null) "remote ${net.remote}"} \
+          ${optionalString (net.remote == null && net.group != null) "group ${net.group}"} \
+          ${optionalString (net.remote != null) "remote ${net.remote}"} \
+          ${if net.learning  then "learning" else "nolearning"} \
+          ${if net.external  then "external" else "noexternal"} \
+          ${if net.vnifilter  then "vnifilter" else "novnifilter"} \
+          ${optionalString (net.dev != null) "dev ${net.dev}"} \
           dstport ${toString net.port} \
-          dev ${net.dev} ${net.extraOptions}
+          ${net.extraOptions}
       '';
       postStop = ''
         ip link delete "${name}" || true
