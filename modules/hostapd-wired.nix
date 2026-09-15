@@ -147,6 +147,11 @@ in {
                   type = types.int;
                   default = 128;
                 };
+
+                nas_identifier = mkOption {
+                  type = types.str;
+                  default = "hostapd";
+                };
               };
             };
 
@@ -212,26 +217,5 @@ in {
             }) icfg.interfaces
         )
       )  cfg.portGroups);
-
-      # (lib.mapAttrs' (igroup: icfg: lib.nameValuePair "hostapd-event-${igroup}" (
-      # {
-      #   path = [ pkgs.hostapd ];
-      #   requires = [ "hostapd-${igroup}.service" ];
-      #   after = [ "hostapd-${igroup}.service" ];
-      #   bindsTo = [ "hostapd-${igroup}.service" ];
-      #   wantedBy = [ "multi-user.target" ];
-      #
-      #   serviceConfig = {
-      #     RuntimeDirectory="hostapd";
-      #     ExecStart = "${lib.getBin pkgs.hostapd}/bin/hostapd_cli -p ${ctrlSocketPath igroup} -a ${
-      #       actionScript {
-      #         inherit (icfg) bridge;
-      #         macsec = icfg.settings.macsec_policy;
-      #       }}";
-      #     Restart = "always";
-      #     RestartSec = "1s";
-      #     Type = "simple";
-      #   };
-      # })) cfg.interfaces);
   };
 }

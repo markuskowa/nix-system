@@ -164,8 +164,6 @@ in {
         settings = {
           own_ip_addr="192.168.1.1";
 
-          nas_identifier = "apd";
-
           # RADIUS authentication server
           auth_server_addr = "192.168.1.5";
           auth_server_port = 1812;
@@ -184,8 +182,6 @@ in {
           macsec_policy = true;
 
           own_ip_addr="192.168.1.1";
-
-          nas_identifier = "apd";
 
           # RADIUS authentication server
           auth_server_addr = "192.168.1.5";
@@ -216,7 +212,7 @@ in {
         wpaConf = pkgs.writeText "wpa.conf" ''
           ctrl_interface=/run/wpa_supplicant/client
           ap_scan=0
-          eapol_version=2
+          eapol_version=3
           network={
             key_mgmt=IEEE8021X
             eap=TTLS
