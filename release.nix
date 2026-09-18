@@ -48,6 +48,7 @@ in {
     userInit = handleTest ./tests/userInit.nix {};
     macsec-psk  = handleTest ./tests/macsec-psk.nix {};
     hostapd-radius = handleTest ./tests/hostapd-radius.nix {};
+    hostapd-vxlan = handleTest ./tests/hostapd-vxlan.nix {};
     vxlan = handleTest ./tests/vxlan.nix {};
     netboot = import ./tests/netboot.nix { inherit lib pkgs; };
     nfs-tls = handleTest ./tests/nfs-tls.nix { inherit lib pkgs; };
