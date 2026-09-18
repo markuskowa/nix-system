@@ -17,10 +17,10 @@ in {
     description = "List of networks and hosts";
     type = with types; attrsOf (submodule ( { ... } : {
       options = {
-        id = mkOption {
-          description = "VLAN id";
-          type = types.ints.between 0 16777214;
-          default = 0;
+        vni = mkOption {
+          description = "VXLAN id";
+          type = with types; nullOr (ints.between 0 16777214);
+          default = null;
         };
 
         local = mkOption {
@@ -42,7 +42,13 @@ in {
         };
 
         port = mkOption {
-          description = "UDP port";
+          description = "Local UDP port";
+          type = types.port;
+          default = 4789;
+        };
+
+        dstport = mkOption {
+          description = "Destinaiton UDP port";
           type = types.port;
           default = 4789;
         };
@@ -96,14 +102,17 @@ in {
         ip link show dev "${name}" >/dev/null 2>&1 && ip link delete "${name}"
 
         # Add new interface
-        ip link add ${name} type vxlan id ${toString net.id} ${optionalString (net.local != null) "local ${net.local}"} \
+        ip link add ${name} type vxlan \
+          ${optionalString (net.vni != null) "id ${toString net.vni}"} \
+          ${optionalString (net.local != null) "local ${net.local}"} \
           ${optionalString (net.remote == null && net.group != null) "group ${net.group}"} \
           ${optionalString (net.remote != null) "remote ${net.remote}"} \
+          srcport ${toString net.port} ${toString net.port} \
+          dstport ${toString net.dstport} \
           ${if net.learning  then "learning" else "nolearning"} \
           ${if net.external  then "external" else "noexternal"} \
           ${if net.vnifilter  then "vnifilter" else "novnifilter"} \
           ${optionalString (net.dev != null) "dev ${net.dev}"} \
-          dstport ${toString net.port} \
           ${net.extraOptions}
       '';
       postStop = ''

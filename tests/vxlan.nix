@@ -16,7 +16,7 @@ let
     networking.bridges.ve-br.interfaces = [  "ve-0" "vxlan1" ];
 
     networking.vxlans.vxlan1 = {
-      id = 1;
+      vni = 1;
       dev = "eth1";
     };
 
