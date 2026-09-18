@@ -196,12 +196,6 @@ in {
             map (iface: {
               name = "hostapd-event-${igroup}-${iface}";
               value = {
-                path = [ pkgs.hostapd ];
-                requires = [ "hostapd-${igroup}.service" ];
-                after = [ "hostapd-${igroup}.service" ];
-                bindsTo = [ "hostapd-${igroup}.service" ];
-                wantedBy = [ "multi-user.target" ];
-
                 serviceConfig = {
                   RuntimeDirectory="hostapd";
                   ExecStart = "${lib.getBin pkgs.hostapd}/bin/hostapd_cli -p ${ctrlSocketPath igroup} -i ${iface} -a ${
@@ -209,13 +203,26 @@ in {
                       inherit (icfg) bridge;
                       macsec = icfg.settings.macsec_policy;
                     }}";
-                  Restart = "always";
-                  RestartSec = "1s";
                   Type = "simple";
                 };
               };
             }) icfg.interfaces
         )
       )  cfg.portGroups);
+
+      # Path activation units
+      systemd.paths = lib.concatMapAttrs (igroup: icfg:
+        lib.listToAttrs (
+            map (iface: {
+              name = "hostapd-event-${igroup}-${iface}";
+              value = {
+                wantedBy = [ "multi-user.target" ];
+                pathConfig = {
+                  PathChanged = "${ctrlSocketPath igroup}/${iface}";
+                };
+              };
+            }) icfg.interfaces
+        )
+      )  cfg.portGroups;
   };
 }
