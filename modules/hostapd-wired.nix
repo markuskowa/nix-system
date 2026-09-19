@@ -175,10 +175,11 @@ in {
         configFile = settingsFormat.generate "hostapd-${igroup}.conf" settings;
         interfaceDevices = map (x: "sys-subsystem-net-devices-${x}.device" ) icfg.interfaces;
       in {
-        path = [ pkgs.hostapd ];
-        requires = [ "network-online.target" ];
-        wantedBy = [ "multi-user.target" ];
+        # path = [ pkgs.hostapd ];
+        requires = interfaceDevices;
         after = interfaceDevices;
+        wants = [ "network.target" ];
+        wantedBy = [ "multi-user.target" ];
 
         serviceConfig = {
           RuntimeDirectory="hostapd";
@@ -217,6 +218,7 @@ in {
               name = "hostapd-event-${igroup}-${iface}";
               value = {
                 wantedBy = [ "multi-user.target" ];
+                before = [ "hostapd-event-${igroup}-${iface}.service" ];
                 pathConfig = {
                   PathChanged = "${ctrlSocketPath igroup}/${iface}";
                 };

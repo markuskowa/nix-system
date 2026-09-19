@@ -107,8 +107,7 @@ let
 
       in {
         after = [ "sys-subsystem-net-devices-${iface}.device" ];
-        # bindsTo = [ "sys-subsystem-net-devices-${iface}.device" ];
-        requiredBy = [ "network-link-${iface}.service" ];
+        bindsTo = [ "sys-subsystem-net-devices-${iface}.device" ];
         wantedBy = [ "multi-user.target" ];
 
         serviceConfig =
