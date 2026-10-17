@@ -1,0 +1,29 @@
+diff --git a/ifupdown2/__main__.py b/ifupdown2/__main__.py
+index 4171fc8..5bec9b7 100755
+--- a/ifupdown2/__main__.py
++++ b/ifupdown2/__main__.py
+@@ -82,9 +82,6 @@ def stand_alone():
+     from datetime import datetime
+     start_time = datetime.now()
+
+-    if not sys.argv[0].endswith("query") and os.geteuid() != 0:
+-        sys.stderr.write('must be root to run this command\n')
+-        return 1
+     try:
+         from ifupdown2.ifupdown.main import Ifupdown2
+         from ifupdown2.lib.nlcache import NetlinkListenerWithCache, NetlinkListenerWithCacheErrorNotInitialized
+diff --git a/ifupdown2/ifupdown/main.py b/ifupdown2/ifupdown/main.py
+index b2ba540..441f0b7 100644
+--- a/ifupdown2/ifupdown/main.py
++++ b/ifupdown2/ifupdown/main.py
+@@ -65,8 +65,6 @@ class Ifupdown2:
+         self.op = args_parse.get_op()
+
+     def main(self, stdin_buffer=None):
+-        if self.op != 'query' and self.uid != 0:
+-            raise MainException('must be root to run this command')
+
+         try:
+             self.read_config()
+
+

@@ -14,6 +14,8 @@ in {
 
   slurm-spank-pyxis = callPackage ./pkgs/slurm-spank-pyxis {};
 
+  ifupdown2 = callPackage ./pkgs/ifupdown2/package.nix {};
+
   formats = pkgs.formats // {
     keyValueCustom = import ./pkgs/formater { inherit pkgs lib; };
   };

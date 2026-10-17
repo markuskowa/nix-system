@@ -24,6 +24,7 @@ in {
     nhc
     target-isns
     ipdeny-zones
+    ifupdown2
     slurm-spank-x11
     slurm-spank-stunnel
     slurm-spank-pyxis
@@ -38,6 +39,7 @@ in {
     banner = handleTest ./tests/banner.nix {};
     iscsi = handleTest ./tests/iscsi.nix {};
     isns = handleTest ./tests/isns.nix {};
+    ifupdown2 = handleTest ./tests/ifupdown2.nix {};
     kea = handleTest ./tests/kea.nix {};
     networkmap = handleTest ./tests/networkmap.nix {};
     netinfra = handleTest ./tests/netinfra.nix {};
