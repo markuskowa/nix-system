@@ -50,6 +50,9 @@ python3Packages.buildPythonApplication (finalAttrs: {
       --replace-fail "'/sbin/mstpctl'" "'${lib.getExe' mstpd "mstpctl"}'" \
       --replace-fail "'/sbin/ethtool'" "'${lib.getExe ethtool}'"
 
+    substituteInPlace ifupdown2/lib/iproute2.py \
+      --replace-fail "'tc'" "'${lib.getExe' iproute2 "tc"}'"
+
     substituteInPlace ifupdown2/ifupdownaddons/modulebase.py \
       --replace-fail "/usr/sbin/ip vrf id" "${lib.getExe' iproute2 "ip"} vrf id"
 
