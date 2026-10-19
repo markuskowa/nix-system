@@ -88,13 +88,29 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    assertions = [
+      {
+        assertion =
+          (lib.length (lib.attrsToList (lib.intersectAttrs config.networking.interfaces cfg.iface))) == 0;
+        message = "Interface configured via ifupdown2 cannot be configured via scripted networking";
+      }
+      {
+        assertion =
+          (lib.length (lib.attrsToList (lib.intersectAttrs config.networking.bridges cfg.iface))) == 0;
+        message = "Bridges configured via ifupdown2 cannot be configured via scripted networking";
+      }
+    ];
+
+    # ifreload requires the vrf tables
+    networking.iproute2.enable = true;
+
     services.ifupdown2.extraArgs = [ "-a" "-L" "/run/ifupdown2/network.lock" ] ++ lib.optionals cfg.debug [ "-v" ];
     services.ifupdown2.auto = mkDefault (map (x: x.name) (attrsToList cfg.iface));
 
     environment.systemPackages = [ cfg.package ];
     nixpkgs.overlays = [ (import ../default.nix) ];
 
-    environment.etc."network/ifupdown-ng.conf".source = format.generate "ifupdown2.conf" cfg.settings;
+    environment.etc."network/ifupdown2.conf".source = format.generate "ifupdown2.conf" cfg.settings;
     environment.etc."network/interfaces".text =
       let
         # prepare attrs for toKeyValue generation:
@@ -136,9 +152,9 @@ in
         RuntimeDirectory = "ifupdown2";
         Type = "oneshot";
         RemainAfterExit = "yes";
-        ExecStart = "${cfg.package}/bin/ifup " + escapeShellArgs cfg.extraArgs;
-        ExecReload = "${cfg.package}/bin/ifreload " + escapeShellArgs cfg.extraArgs;
-        ExecStop = "${cfg.package}/bin/ifdown ${escapeShellArgs cfg.extraArgs}";
+        ExecStart = "${lib.getExe' cfg.package "ifup"} " + escapeShellArgs cfg.extraArgs;
+        ExecReload = "${lib.getExe' cfg.package "ifreload"} " + escapeShellArgs cfg.extraArgs;
+        ExecStop = "${lib.getExe' cfg.package "ifdown"} ${escapeShellArgs cfg.extraArgs}";
       };
     };
 
